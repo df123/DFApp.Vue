@@ -14,11 +14,11 @@ export interface OidcConfig {
 
 export const oidcConfig: OidcConfig = {
   authority: "https://localhost:44369",
-  client_id: "DFApp_Vue",
+  client_id: "DFApp_Web",
   redirect_uri: `${window.location.origin}/auth/callback`,
   post_logout_redirect_uri: `${window.location.origin}/`,
   response_type: "code",
-  scope: "openid profile email roles permissions DFApp offline_access",
+  scope: "openid profile email roles DFApp",
   automaticSilentRenew: true,
   silent_redirect_uri: `${window.location.origin}/auth/silent-callback`
 };

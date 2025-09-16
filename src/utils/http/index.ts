@@ -3,6 +3,8 @@ import Axios, {
   type AxiosRequestConfig,
   type CustomParamsSerializer
 } from "axios";
+
+import { getCurrentUser, silentRenew } from "@/utils/oidc";
 import type {
   PureHttpError,
   RequestMethods,
@@ -11,8 +13,6 @@ import type {
 } from "./types.d";
 import { stringify } from "qs";
 import NProgress from "../progress";
-import { getToken, formatToken } from "@/utils/auth";
-import { useUserStoreHook } from "@/store/modules/user";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -51,7 +51,7 @@ class PureHttp {
   private static retryOriginalRequest(config: PureHttpRequestConfig) {
     return new Promise(resolve => {
       PureHttp.requests.push((token: string) => {
-        config.headers["Authorization"] = formatToken(token);
+        config.headers["Authorization"] = `Bearer ${token}`;
         resolve(config);
       });
     });
@@ -73,38 +73,44 @@ class PureHttp {
           return config;
         }
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
-        const whiteList = ["/refresh-token", "/login"];
-        return whiteList.some(url => config.url.endsWith(url))
+        const whiteList = [
+          "/connect/authorize",
+          "/connect/token",
+          "/connect/userinfo",
+          "/login"
+        ];
+        return whiteList.some(url => config.url.includes(url))
           ? config
-          : new Promise(resolve => {
-              const data = getToken();
-              if (data) {
-                const now = new Date().getTime();
-                const expired = parseInt(data.expires) - now <= 0;
-                if (expired) {
-                  if (!PureHttp.isRefreshing) {
-                    PureHttp.isRefreshing = true;
-                    // token过期刷新
-                    useUserStoreHook()
-                      .handRefreshToken({ refreshToken: data.refreshToken })
-                      .then(res => {
-                        const token = res.data.accessToken;
-                        config.headers["Authorization"] = formatToken(token);
-                        PureHttp.requests.forEach(cb => cb(token));
-                        PureHttp.requests = [];
-                      })
-                      .finally(() => {
-                        PureHttp.isRefreshing = false;
-                      });
+          : new Promise(async resolve => {
+              const user = await getCurrentUser();
+              if (user && !user.expired) {
+                config.headers["Authorization"] = `Bearer ${user.access_token}`;
+                resolve(config);
+              } else if (user && user.expired) {
+                if (!PureHttp.isRefreshing) {
+                  PureHttp.isRefreshing = true;
+                  try {
+                    const renewedUser = await silentRenew();
+                    if (renewedUser) {
+                      config.headers["Authorization"] =
+                        `Bearer ${renewedUser.access_token}`;
+                      PureHttp.requests.forEach(cb =>
+                        cb(renewedUser.access_token)
+                      );
+                      PureHttp.requests = [];
+                    }
+                  } catch (error) {
+                    console.error("Token 刷新失败:", error);
+                    // 刷新失败，清除 token 并重定向登录
+                    localStorage.removeItem("oidc_user");
+                    window.location.href = "/login";
+                  } finally {
+                    PureHttp.isRefreshing = false;
                   }
-                  resolve(PureHttp.retryOriginalRequest(config));
-                } else {
-                  config.headers["Authorization"] = formatToken(
-                    data.accessToken
-                  );
-                  resolve(config);
                 }
+                resolve(PureHttp.retryOriginalRequest(config));
               } else {
+                // 未认证，重定向到登录（但对于 API 请求，可能返回 401）
                 resolve(config);
               }
             });

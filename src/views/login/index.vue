@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Motion from "./utils/motion";
 import { useRouter } from "vue-router";
+import { startAuthentication } from "@/utils/oidc";
 import { message } from "@/utils/message";
 import { loginRules } from "./utils/rule";
 import { ref, reactive, toRaw } from "vue";
@@ -9,7 +10,6 @@ import { useNav } from "@/layout/hooks/useNav";
 import { useEventListener } from "@vueuse/core";
 import type { FormInstance } from "element-plus";
 import { useLayout } from "@/layout/hooks/useLayout";
-import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter, getTopMenu } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
@@ -46,28 +46,13 @@ const onLogin = async (formEl: FormInstance | undefined) => {
   await formEl.validate(valid => {
     if (valid) {
       loading.value = true;
-      useUserStoreHook()
-        .loginByUsername({
-          username: ruleForm.username,
-          password: ruleForm.password
+      startAuthentication()
+        .catch(error => {
+          message("登录失败", { type: "error" });
         })
-        .then(res => {
-          if (res.success) {
-            // 获取后端路由
-            return initRouter().then(() => {
-              disabled.value = true;
-              router
-                .push(getTopMenu(true).path)
-                .then(() => {
-                  message("登录成功", { type: "success" });
-                })
-                .finally(() => (disabled.value = false));
-            });
-          } else {
-            message("登录失败", { type: "error" });
-          }
-        })
-        .finally(() => (loading.value = false));
+        .finally(() => {
+          loading.value = false;
+        });
     }
   });
 };

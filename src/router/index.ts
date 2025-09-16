@@ -179,7 +179,7 @@ router.beforeEach(async (to: ToRouteType, _from, next) => {
     }
   } else {
     if (to.path !== "/login") {
-      if (whiteList.includes(to.fullPath)) {
+      if (whiteList.indexOf(to.path) !== -1) {
         next();
       } else {
         next({ path: "/login" });

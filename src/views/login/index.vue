@@ -1,33 +1,22 @@
 <script setup lang="ts">
 import Motion from "./utils/motion";
-import { useRouter } from "vue-router";
 import { startAuthentication } from "@/utils/oidc";
 import { message } from "@/utils/message";
-import { loginRules } from "./utils/rule";
-import { ref, reactive, toRaw } from "vue";
-import { debounce } from "@pureadmin/utils";
+import { ref, toRaw, onMounted, onUnmounted } from "vue";
 import { useNav } from "@/layout/hooks/useNav";
-import { useEventListener } from "@vueuse/core";
-import type { FormInstance } from "element-plus";
 import { useLayout } from "@/layout/hooks/useLayout";
-import { initRouter, getTopMenu } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
-import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
-import Lock from "~icons/ri/lock-fill";
-import User from "~icons/ri/user-3-fill";
 
 defineOptions({
   name: "Login"
 });
 
-const router = useRouter();
-const loading = ref(false);
-const disabled = ref(false);
-const ruleFormRef = ref<FormInstance>();
+const authAttempted = ref(false);
+const authTimeout = ref<number | null>(null);
 
 const { initStorage } = useLayout();
 initStorage();
@@ -36,40 +25,25 @@ const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
 dataThemeChange(overallStyle.value);
 const { title } = useNav();
 
-const ruleForm = reactive({
-  username: "admin",
-  password: "admin123"
+onMounted(() => {
+  authTimeout.value = window.setTimeout(() => {
+    if (authAttempted.value) return;
+    authAttempted.value = true;
+    startAuthentication()
+      .catch(() => {
+        message("登录失败", { type: "error" });
+      })
+      .finally(() => {
+        authTimeout.value = null;
+      });
+  }, 500);
 });
 
-const onLogin = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  await formEl.validate(valid => {
-    if (valid) {
-      loading.value = true;
-      startAuthentication()
-        .catch(error => {
-          message("登录失败", { type: "error" });
-        })
-        .finally(() => {
-          loading.value = false;
-        });
-    }
-  });
-};
-
-const immediateDebounce: any = debounce(
-  formRef => onLogin(formRef),
-  1000,
-  true
-);
-
-useEventListener(document, "keydown", ({ code }) => {
-  if (
-    ["Enter", "NumpadEnter"].includes(code) &&
-    !disabled.value &&
-    !loading.value
-  )
-    immediateDebounce(ruleFormRef.value);
+onUnmounted(() => {
+  if (authTimeout.value) {
+    clearTimeout(authTimeout.value);
+    authTimeout.value = null;
+  }
 });
 </script>
 
@@ -96,58 +70,6 @@ useEventListener(document, "keydown", ({ code }) => {
           <Motion>
             <h2 class="outline-hidden">{{ title }}</h2>
           </Motion>
-
-          <el-form
-            ref="ruleFormRef"
-            :model="ruleForm"
-            :rules="loginRules"
-            size="large"
-          >
-            <Motion :delay="100">
-              <el-form-item
-                :rules="[
-                  {
-                    required: true,
-                    message: '请输入账号',
-                    trigger: 'blur'
-                  }
-                ]"
-                prop="username"
-              >
-                <el-input
-                  v-model="ruleForm.username"
-                  clearable
-                  placeholder="账号"
-                  :prefix-icon="useRenderIcon(User)"
-                />
-              </el-form-item>
-            </Motion>
-
-            <Motion :delay="150">
-              <el-form-item prop="password">
-                <el-input
-                  v-model="ruleForm.password"
-                  clearable
-                  show-password
-                  placeholder="密码"
-                  :prefix-icon="useRenderIcon(Lock)"
-                />
-              </el-form-item>
-            </Motion>
-
-            <Motion :delay="250">
-              <el-button
-                class="w-full mt-4!"
-                size="default"
-                type="primary"
-                :loading="loading"
-                :disabled="disabled"
-                @click="onLogin(ruleFormRef)"
-              >
-                登录
-              </el-button>
-            </Motion>
-          </el-form>
         </div>
       </div>
     </div>

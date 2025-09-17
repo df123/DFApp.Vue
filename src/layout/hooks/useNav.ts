@@ -80,8 +80,8 @@ export function useNav() {
   }
 
   /** 退出登录 */
-  function logout() {
-    useUserStoreHook().logOut();
+  async function logout() {
+    await import("@/utils/oidc").then(({ logout }) => logout());
   }
 
   function backTopMenu() {

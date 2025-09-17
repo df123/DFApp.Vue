@@ -10,17 +10,19 @@ export interface OidcConfig {
   scope: string;
   automaticSilentRenew: boolean;
   silent_redirect_uri: string;
+  client_secret: string;
 }
 
 export const oidcConfig: OidcConfig = {
   authority: "https://localhost:44369",
-  client_id: "DFApp_Web",
+  client_id: "",
   redirect_uri: `${window.location.origin}/auth/callback`,
   post_logout_redirect_uri: `${window.location.origin}/`,
   response_type: "code",
   scope: "openid profile email roles DFApp",
   automaticSilentRenew: true,
-  silent_redirect_uri: `${window.location.origin}/auth/silent-callback`
+  silent_redirect_uri: `${window.location.origin}/auth/silent-callback`,
+  client_secret: ""
 };
 
 // 导出 UserManager 实例（可选，工具类中创建）

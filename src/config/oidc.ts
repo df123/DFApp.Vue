@@ -15,15 +15,14 @@ export interface OidcConfig {
 
 export const oidcConfig: OidcConfig = {
   authority: "https://localhost:44369",
-  client_id: "",
+  client_id: import.meta.env.VITE_CLIENT_ID || "",
   redirect_uri: `${window.location.origin}/auth/callback`,
-  post_logout_redirect_uri: `${window.location.origin}/`,
+  post_logout_redirect_uri: `${window.location.origin}/signout-callback-oidc`,
   response_type: "code",
   scope: "openid profile email roles DFApp",
   automaticSilentRenew: true,
   silent_redirect_uri: `${window.location.origin}/auth/silent-callback`,
-  client_secret: ""
+  client_secret: import.meta.env.VITE_CLIENT_SECRET || ""
 };
 
-// 导出 UserManager 实例（可选，工具类中创建）
 export const userManager = new UserManager(oidcConfig);

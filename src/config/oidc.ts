@@ -15,14 +15,14 @@ export interface OidcConfig {
 
 export const oidcConfig: OidcConfig = {
   authority: "https://localhost:44369",
-  client_id: import.meta.env.VITE_CLIENT_ID || "",
+  client_id: import.meta.env.VITE_OAUTH_CLIENT_ID || "",
   redirect_uri: `${window.location.origin}/auth/callback`,
   post_logout_redirect_uri: `${window.location.origin}/signout-callback-oidc`,
   response_type: "code",
   scope: "openid profile email roles DFApp",
   automaticSilentRenew: true,
   silent_redirect_uri: `${window.location.origin}/auth/silent-callback`,
-  client_secret: import.meta.env.VITE_CLIENT_SECRET || ""
+  client_secret: import.meta.env.VITE_OAUTH_SECRET || ""
 };
 
 export const userManager = new UserManager(oidcConfig);

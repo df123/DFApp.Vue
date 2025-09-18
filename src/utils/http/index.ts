@@ -79,7 +79,7 @@ class PureHttp {
           "/connect/userinfo",
           "/login"
         ];
-        return whiteList.some(url => config.url.includes(url))
+        return whiteList.some(url => config.url.endsWith(url))
           ? config
           : new Promise(async resolve => {
               const user = await getCurrentUser();

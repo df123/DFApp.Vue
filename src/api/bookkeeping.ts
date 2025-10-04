@@ -20,7 +20,7 @@ class BookkeepingCategoryApi extends ApiService {
   async getCategories(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<BookkeepingCategoryDto>> {
-    return this.get("", { params });
+    return this.get("", params);
   }
 
   /**
@@ -61,7 +61,7 @@ class BookkeepingExpenditureApi extends ApiService {
   async getExpenditures(
     params?: GetExpendituresRequestDto
   ): Promise<PagedResultDto<BookkeepingExpenditureDto>> {
-    return this.get("", { params });
+    return this.get("", params);
   }
 
   /**

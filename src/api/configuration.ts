@@ -17,7 +17,7 @@ class ConfigurationApi extends ApiService {
   async getConfigurations(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<ConfigurationInfoDto>> {
-    return this.get("", { params });
+    return this.get("", params);
   }
 
   /**

@@ -17,7 +17,7 @@ class DynamicIpApi extends ApiService {
   async getDynamicIPs(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<DynamicIPDto>> {
-    return this.get("", { params });
+    return this.get("", params);
   }
 
   /**

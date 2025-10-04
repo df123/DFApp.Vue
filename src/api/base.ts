@@ -62,8 +62,31 @@ export class ApiService {
 
   // 通用请求方法
   protected async request<T>(config: AxiosRequestConfig): Promise<T> {
-    const response = await this.http.request<ApiResponse<T>>(config);
-    return response.data.data!;
+    const response = await this.http.request<any>(config);
+
+    // 兼容两种后端返回：
+    // 1. 统一包装的 ApiResponse<T> -> { success: boolean, data: T }
+    // 2. 直接返回数据 T（例如直接返回 PagedResultDto）
+    const respData = response.data;
+
+    if (respData && typeof respData === "object") {
+      // 情况 1：符合 ApiResponse 结构，且有 data 字段
+      if (Object.prototype.hasOwnProperty.call(respData, "success")) {
+        // 如果 success 为 false，抛出业务错误
+        if (respData.success === false) {
+          throw new Error(respData.error?.message || "请求失败");
+        }
+
+        // 返回 data（可能为 undefined）
+        return respData.data as T;
+      }
+
+      // 情况 2：直接返回数据（未包装），直接返回该对象
+      return respData as T;
+    }
+
+    // 如果没有任何数据，抛出错误以便上层捕获并记录
+    throw new Error("服务器返回空响应");
   }
 
   // GET 请求

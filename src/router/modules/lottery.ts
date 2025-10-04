@@ -11,7 +11,7 @@ const lottery: RouteRecordRaw = {
   },
   children: [
     {
-      path: "",
+      path: "lottery-data",
       name: "LotteryData",
       component: () => import("@/views/lottery/index.vue"),
       meta: {

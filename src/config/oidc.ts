@@ -22,7 +22,7 @@ export const oidcConfig: OidcConfig = {
   scope: "openid profile email roles DFApp",
   automaticSilentRenew: true,
   silent_redirect_uri: `${window.location.origin}/auth/silent-callback`,
-  client_secret: import.meta.env.VITE_OAUTH_SECRET || ""
+  client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || ""
 };
 
 export const userManager = new UserManager(oidcConfig);

@@ -35,3 +35,75 @@ export interface ApiResponse<T> {
     code?: string;
   };
 }
+
+// 配置管理类型
+export interface ConfigurationInfoDto {
+  id: number;
+  moduleName: string;
+  configurationName: string;
+  configurationValue: string;
+  remark: string;
+  creationTime?: string;
+  lastModificationTime?: string;
+}
+
+export interface CreateUpdateConfigurationInfoDto {
+  moduleName: string;
+  configurationName: string;
+  configurationValue: string;
+  remark?: string;
+}
+
+// 动态IP类型
+export interface DynamicIPDto {
+  id: string; // UUID 格式
+  ip: string;
+  port: string;
+  creationTime?: string;
+  lastModificationTime?: string;
+}
+
+export interface CreateUpdateDynamicIPDto {
+  ip: string;
+  port: string;
+}
+
+// 记账分类类型
+export interface BookkeepingCategoryDto {
+  id: number;
+  category: string;
+  creationTime?: string;
+  lastModificationTime?: string;
+}
+
+export interface CreateUpdateBookkeepingCategoryDto {
+  category: string;
+}
+
+// 记账支出类型
+export interface BookkeepingExpenditureDto {
+  id: number;
+  expenditureDate: string; // ISO 8601 格式
+  expenditure: number; // double 类型
+  remark: string;
+  isBelongToSelf: boolean;
+  category: BookkeepingCategoryDto;
+  categoryId: number;
+  creationTime?: string;
+  lastModificationTime?: string;
+}
+
+export interface CreateUpdateBookkeepingExpenditureDto {
+  expenditureDate: string;
+  expenditure: number;
+  remark?: string;
+  isBelongToSelf: boolean;
+  categoryId: number;
+}
+
+// 支出查询参数
+export interface GetExpendituresRequestDto extends PagedRequestDto {
+  filter?: string;
+  categoryId?: number;
+  isBelongToSelf?: boolean;
+}

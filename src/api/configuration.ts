@@ -1,45 +1,56 @@
-import ApiService from "./base";
-import type { PagedRequestDto, PagedResultDto } from "../types/api";
+import { ApiService } from "./base";
 import type {
+  PagedRequestDto,
+  PagedResultDto,
   ConfigurationInfoDto,
   CreateUpdateConfigurationInfoDto
-} from "../types/business";
+} from "@/types/api";
 
-// 配置管理 API
-export class ConfigurationApi extends ApiService {
+class ConfigurationApi extends ApiService {
   constructor() {
-    super("/api");
+    super("/api/app/configuration-info");
   }
 
-  // GET /api/app/configuration-info
+  /**
+   * 获取配置列表
+   */
   async getConfigurations(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<ConfigurationInfoDto>> {
-    return this.get("/app/configuration-info", params);
+    return this.get("", { params });
   }
 
-  // POST /api/app/configuration-info
+  /**
+   * 创建配置
+   */
   async createConfiguration(
     request: CreateUpdateConfigurationInfoDto
   ): Promise<ConfigurationInfoDto> {
-    return this.post("/app/configuration-info", request);
+    return this.post("", request);
   }
 
-  // PUT /api/app/configuration-info/{id}
+  /**
+   * 更新配置
+   */
   async updateConfiguration(
     id: number,
     request: CreateUpdateConfigurationInfoDto
   ): Promise<ConfigurationInfoDto> {
-    return this.put(`/app/configuration-info/${id}`, request);
+    return this.put(`/${id}`, request);
   }
 
-  // DELETE /api/app/configuration-info/{id}
+  /**
+   * 删除配置
+   */
   async deleteConfiguration(id: number): Promise<void> {
-    return this.delete(`/app/configuration-info/${id}`);
+    return this.delete(`/${id}`);
   }
 }
 
-// 导出实例
+// 导出单例实例
 export const configurationApi = new ConfigurationApi();
 
-export default configurationApi;
+// 导出用于 Composition API 的 hook
+export function useConfigurationApi() {
+  return configurationApi;
+}

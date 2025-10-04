@@ -1,101 +1,105 @@
-import ApiService from "./base";
-import type { PagedRequestDto, PagedResultDto } from "../types/api";
+import { ApiService } from "./base";
 import type {
+  PagedRequestDto,
+  PagedResultDto,
   BookkeepingCategoryDto,
   CreateUpdateBookkeepingCategoryDto,
   BookkeepingExpenditureDto,
   CreateUpdateBookkeepingExpenditureDto,
-  GetExpendituresRequestDto,
-  ChartJSDto,
-  ChartDataRequestDto,
-  MonthlyExpenditureDto
-} from "../types/business";
+  GetExpendituresRequestDto
+} from "@/types/api";
 
-// 记账分类 API
-export class BookkeepingCategoryApi extends ApiService {
+class BookkeepingCategoryApi extends ApiService {
   constructor() {
-    super("/api");
+    super("/api/app/bookkeeping-category");
   }
 
-  // GET /api/app/bookkeeping-category
+  /**
+   * 获取记账分类列表
+   */
   async getCategories(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<BookkeepingCategoryDto>> {
-    return this.get("/app/bookkeeping-category", params);
+    return this.get("", { params });
   }
 
-  // POST /api/app/bookkeeping-category
+  /**
+   * 创建记账分类
+   */
   async createCategory(
     request: CreateUpdateBookkeepingCategoryDto
   ): Promise<BookkeepingCategoryDto> {
-    return this.post("/app/bookkeeping-category", request);
+    return this.post("", request);
   }
 
-  // PUT /api/app/bookkeeping-category/{id}
+  /**
+   * 更新记账分类
+   */
   async updateCategory(
     id: number,
     request: CreateUpdateBookkeepingCategoryDto
   ): Promise<BookkeepingCategoryDto> {
-    return this.put(`/app/bookkeeping-category/${id}`, request);
+    return this.put(`/${id}`, request);
   }
 
-  // DELETE /api/app/bookkeeping-category/{id}
+  /**
+   * 删除记账分类
+   */
   async deleteCategory(id: number): Promise<void> {
-    return this.delete(`/app/bookkeeping-category/${id}`);
+    return this.delete(`/${id}`);
   }
 }
 
-// 记账支出 API
-export class BookkeepingExpenditureApi extends ApiService {
+class BookkeepingExpenditureApi extends ApiService {
   constructor() {
-    super("/api");
+    super("/api/app/bookkeeping-expenditure");
   }
 
-  // GET /api/app/bookkeeping-expenditure
+  /**
+   * 获取支出列表
+   */
   async getExpenditures(
     params?: GetExpendituresRequestDto
   ): Promise<PagedResultDto<BookkeepingExpenditureDto>> {
-    return this.get("/app/bookkeeping-expenditure", params);
+    return this.get("", { params });
   }
 
-  // POST /api/app/bookkeeping-expenditure
+  /**
+   * 创建支出
+   */
   async createExpenditure(
     request: CreateUpdateBookkeepingExpenditureDto
   ): Promise<BookkeepingExpenditureDto> {
-    return this.post("/app/bookkeeping-expenditure", request);
+    return this.post("", request);
   }
 
-  // PUT /api/app/bookkeeping-expenditure/{id}
+  /**
+   * 更新支出
+   */
   async updateExpenditure(
     id: number,
     request: CreateUpdateBookkeepingExpenditureDto
   ): Promise<BookkeepingExpenditureDto> {
-    return this.put(`/app/bookkeeping-expenditure/${id}`, request);
+    return this.put(`/${id}`, request);
   }
 
-  // DELETE /api/app/bookkeeping-expenditure/{id}
+  /**
+   * 删除支出
+   */
   async deleteExpenditure(id: number): Promise<void> {
-    return this.delete(`/app/bookkeeping-expenditure/${id}`);
-  }
-
-  // GET /api/app/bookkeeping-expenditure/chart - 图表数据
-  async getChartData(params?: ChartDataRequestDto): Promise<ChartJSDto> {
-    return this.get("/app/bookkeeping-expenditure/chart", params);
-  }
-
-  // GET /api/app/bookkeeping-expenditure/monthly-expenditure - 月度支出
-  async getMonthlyExpenditure(year?: number): Promise<MonthlyExpenditureDto> {
-    return this.get("/app/bookkeeping-expenditure/monthly-expenditure", {
-      year
-    });
+    return this.delete(`/${id}`);
   }
 }
 
-// 导出实例
-export const categoryApi = new BookkeepingCategoryApi();
-export const expenditureApi = new BookkeepingExpenditureApi();
+// 导出单例实例
+export const bookkeepingCategoryApi = new BookkeepingCategoryApi();
+export const bookkeepingExpenditureApi = new BookkeepingExpenditureApi();
 
-export default {
-  category: categoryApi,
-  expenditure: expenditureApi
-};
+// 导出用于 Composition API 的 hook
+export function useBookkeepingCategoryApi() {
+  return bookkeepingCategoryApi;
+}
+
+export function useBookkeepingExpenditureApi() {
+  return bookkeepingExpenditureApi;
+}

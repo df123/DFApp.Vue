@@ -1,42 +1,56 @@
-import ApiService from "./base";
-import type { PagedRequestDto, PagedResultDto } from "../types/api";
-import type { DynamicIPDto, CreateUpdateDynamicIPDto } from "../types/business";
+import { ApiService } from "./base";
+import type {
+  PagedRequestDto,
+  PagedResultDto,
+  DynamicIPDto,
+  CreateUpdateDynamicIPDto
+} from "@/types/api";
 
-// 动态IP API
-export class DynamicIpApi extends ApiService {
+class DynamicIpApi extends ApiService {
   constructor() {
-    super("/api");
+    super("/api/app/dynamic-ip");
   }
 
-  // GET /api/app/dynamic-ip
+  /**
+   * 获取动态IP列表
+   */
   async getDynamicIPs(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<DynamicIPDto>> {
-    return this.get("/app/dynamic-ip", params);
+    return this.get("", { params });
   }
 
-  // POST /api/app/dynamic-ip
+  /**
+   * 创建动态IP
+   */
   async createDynamicIP(
     request: CreateUpdateDynamicIPDto
   ): Promise<DynamicIPDto> {
-    return this.post("/app/dynamic-ip", request);
+    return this.post("", request);
   }
 
-  // PUT /api/app/dynamic-ip/{id}
+  /**
+   * 更新动态IP
+   */
   async updateDynamicIP(
     id: string,
     request: CreateUpdateDynamicIPDto
   ): Promise<DynamicIPDto> {
-    return this.put(`/app/dynamic-ip/${id}`, request);
+    return this.put(`/${id}`, request);
   }
 
-  // DELETE /api/app/dynamic-ip/{id}
+  /**
+   * 删除动态IP
+   */
   async deleteDynamicIP(id: string): Promise<void> {
-    return this.delete(`/app/dynamic-ip/${id}`);
+    return this.delete(`/${id}`);
   }
 }
 
-// 导出实例
+// 导出单例实例
 export const dynamicIpApi = new DynamicIpApi();
 
-export default dynamicIpApi;
+// 导出用于 Composition API 的 hook
+export function useDynamicIpApi() {
+  return dynamicIpApi;
+}

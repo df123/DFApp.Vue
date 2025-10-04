@@ -11,7 +11,7 @@ const telegram: RouteRecordRaw = {
   },
   children: [
     {
-      path: "login",
+      path: "tg/login",
       name: "TGLogin",
       component: () => import("@/views/telegram/login/index.vue"),
       meta: {

@@ -6,7 +6,7 @@ const bookkeeping: RouteRecordRaw = {
   component: () => import("@/views/bookkeeping/index.vue"),
   meta: {
     title: "记账管理",
-    icon: "ep:receipt",
+    icon: "ep:notebook",
     alwaysShow: true
   },
   children: [

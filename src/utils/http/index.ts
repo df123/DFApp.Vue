@@ -26,7 +26,8 @@ const defaultConfig: AxiosRequestConfig = {
   // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
   paramsSerializer: {
     serialize: stringify as unknown as CustomParamsSerializer
-  }
+  },
+  withCredentials: false
 };
 
 class PureHttp {
@@ -72,6 +73,7 @@ class PureHttp {
           PureHttp.initConfig.beforeRequestCallback(config);
           return config;
         }
+
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
         const whiteList = [
           "/connect/authorize",

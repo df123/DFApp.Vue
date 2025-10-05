@@ -1,4 +1,4 @@
-import { ApiService } from "./base";
+import { http } from "@/utils/http";
 import type {
   PagedRequestDto,
   PagedResultDto,
@@ -9,10 +9,8 @@ import type {
   GetExpendituresRequestDto
 } from "@/types/api";
 
-class BookkeepingCategoryApi extends ApiService {
-  constructor() {
-    super("/api/app/bookkeeping-category");
-  }
+class BookkeepingCategoryApi {
+  private baseUrl = "/api/app/bookkeeping-category";
 
   /**
    * 获取记账分类列表
@@ -20,7 +18,7 @@ class BookkeepingCategoryApi extends ApiService {
   async getCategories(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<BookkeepingCategoryDto>> {
-    return this.get("", params);
+    return http.get(this.baseUrl, { params });
   }
 
   /**
@@ -29,7 +27,7 @@ class BookkeepingCategoryApi extends ApiService {
   async createCategory(
     request: CreateUpdateBookkeepingCategoryDto
   ): Promise<BookkeepingCategoryDto> {
-    return this.post("", request);
+    return http.post(this.baseUrl, { data: request });
   }
 
   /**
@@ -39,21 +37,19 @@ class BookkeepingCategoryApi extends ApiService {
     id: number,
     request: CreateUpdateBookkeepingCategoryDto
   ): Promise<BookkeepingCategoryDto> {
-    return this.put(`/${id}`, request);
+    return http.request("put", `${this.baseUrl}/${id}`, { data: request });
   }
 
   /**
    * 删除记账分类
    */
   async deleteCategory(id: number): Promise<void> {
-    return this.delete(`/${id}`);
+    return http.request("delete", `${this.baseUrl}/${id}`);
   }
 }
 
-class BookkeepingExpenditureApi extends ApiService {
-  constructor() {
-    super("/api/app/bookkeeping-expenditure");
-  }
+class BookkeepingExpenditureApi {
+  private baseUrl = "/api/app/bookkeeping-expenditure";
 
   /**
    * 获取支出列表
@@ -61,7 +57,7 @@ class BookkeepingExpenditureApi extends ApiService {
   async getExpenditures(
     params?: GetExpendituresRequestDto
   ): Promise<PagedResultDto<BookkeepingExpenditureDto>> {
-    return this.get("", params);
+    return http.get(this.baseUrl, { params });
   }
 
   /**
@@ -70,7 +66,7 @@ class BookkeepingExpenditureApi extends ApiService {
   async createExpenditure(
     request: CreateUpdateBookkeepingExpenditureDto
   ): Promise<BookkeepingExpenditureDto> {
-    return this.post("", request);
+    return http.post(this.baseUrl, { data: request, withCredentials: false });
   }
 
   /**
@@ -80,14 +76,14 @@ class BookkeepingExpenditureApi extends ApiService {
     id: number,
     request: CreateUpdateBookkeepingExpenditureDto
   ): Promise<BookkeepingExpenditureDto> {
-    return this.put(`/${id}`, request);
+    return http.request("put", `${this.baseUrl}/${id}`, { data: request });
   }
 
   /**
    * 删除支出
    */
   async deleteExpenditure(id: number): Promise<void> {
-    return this.delete(`/${id}`);
+    return http.request("delete", `${this.baseUrl}/${id}`);
   }
 }
 

@@ -6,7 +6,9 @@ import type {
   CreateUpdateBookkeepingCategoryDto,
   BookkeepingExpenditureDto,
   CreateUpdateBookkeepingExpenditureDto,
-  GetExpendituresRequestDto
+  GetExpendituresRequestDto,
+  ChartJSDto,
+  GetChartDataRequestDto
 } from "@/types/api";
 
 class BookkeepingCategoryApi {
@@ -84,6 +86,13 @@ class BookkeepingExpenditureApi {
    */
   async deleteExpenditure(id: number): Promise<void> {
     return http.request("delete", `${this.baseUrl}/${id}`);
+  }
+
+  /**
+   * 获取图表数据
+   */
+  async getChartData(params: GetChartDataRequestDto): Promise<ChartJSDto> {
+    return http.get(`${this.baseUrl}/chart-jSDto`, { params });
   }
 }
 

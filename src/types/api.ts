@@ -107,3 +107,28 @@ export interface GetExpendituresRequestDto extends PagedRequestDto {
   categoryId?: number;
   isBelongToSelf?: boolean;
 }
+
+// 图表数据 DTO
+export interface ChartJSDto {
+  labels: string[];
+  datasets: ChartDataset[];
+  total: number;
+  differenceTotal: number;
+}
+
+export interface ChartDataset {
+  label: string;
+  data: number[];
+  backgroundColor: string[];
+  borderColor: string[];
+  borderWidth: number;
+}
+
+// 图表查询参数
+export interface GetChartDataRequestDto {
+  start?: string;
+  end?: string;
+  compareType?: number;
+  numberType?: string;
+  isBelongToSelf?: boolean | null;
+}

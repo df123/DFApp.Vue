@@ -8,11 +8,11 @@
       </template>
 
       <!-- 筛选条件区域 -->
-      <el-row class="hidden-md-and-down">
-        <el-col :span="2">
+      <el-row class="hidden-md-and-down filter-row" :gutter="16">
+        <el-col :span="4">
           <el-select
             v-model="isBelongToSelf"
-            class="m-2"
+            class="filter-item"
             @change="isBelongToSelfChange"
           >
             <el-option
@@ -23,10 +23,10 @@
             />
           </el-select>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="4">
           <el-select
             v-model="compareTypeValue"
-            class="m-2"
+            class="filter-item"
             placeholder="对比模式"
             @change="compareTypeChange"
           >
@@ -38,10 +38,10 @@
             />
           </el-select>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="4">
           <el-select
             v-model="chartTypeItemValue"
-            class="m-2"
+            class="filter-item"
             placeholder="图类型"
             @change="chartChange"
           >
@@ -53,10 +53,10 @@
             />
           </el-select>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="4">
           <el-select
             v-model="numberTypeValue"
-            class="m-2"
+            class="filter-item"
             placeholder="数字模式"
             @change="numberChange"
           >
@@ -71,7 +71,7 @@
         <el-col :span="8">
           <el-date-picker
             v-model="dateRagen"
-            class="m-2"
+            class="filter-item"
             type="daterange"
             range-separator="To"
             start-placeholder="开始时间"
@@ -394,15 +394,24 @@ function formatDate(date: Date): string {
 </script>
 
 <style scoped>
-
-
-@media (width <= 768px) {
+@media screen and (width <= 768px) {
   .hidden-md-and-down {
-    display: none;
+    display: none !important;
   }
 
   .hidden-md-and-up {
-    display: block;
+    display: block !important;
+  }
+}
+
+/* 桌面端样式 */
+@media screen and (width >= 769px) {
+  .hidden-md-and-down {
+    display: flex !important;
+  }
+
+  .hidden-md-and-up {
+    display: none !important;
   }
 }
 
@@ -476,6 +485,15 @@ button {
 
 .red {
   color: var(--el-color-error);
+}
+
+/* 筛选条件样式 */
+.filter-row {
+  margin-bottom: 20px;
+}
+
+.filter-item {
+  width: 100%;
 }
 
 /* 响应式隐藏类 */

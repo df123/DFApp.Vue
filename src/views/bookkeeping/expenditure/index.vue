@@ -234,8 +234,8 @@ const categories = ref<BookkeepingCategoryDto[]>([]);
 const pageTotal = ref(0);
 const total = ref(0);
 
-// 表单数据
-const formData = reactive<CreateUpdateBookkeepingExpenditureDto>({
+// 表单数据 (use ref instead of reactive)
+const formData = ref<CreateUpdateBookkeepingExpenditureDto>({
   expenditureDate: "",
   expenditure: 0,
   remark: "",
@@ -392,7 +392,7 @@ const handleCurrentChange = (page: number) => {
 
 const handleCreate = () => {
   currentEditId.value = null;
-  Object.assign(formData, {
+  Object.assign(formData.value, {
     expenditureDate: new Date().toISOString().split("T")[0],
     expenditure: 0,
     remark: "",
@@ -404,7 +404,7 @@ const handleCreate = () => {
 
 const handleEdit = (row: BookkeepingExpenditureDto) => {
   currentEditId.value = row.id;
-  Object.assign(formData, {
+  Object.assign(formData.value, {
     expenditureDate: row.expenditureDate,
     expenditure: row.expenditure,
     remark: row.remark || "",
@@ -447,10 +447,14 @@ const handleSubmit = async () => {
   submitting.value = true;
   try {
     if (currentEditId.value) {
-      await expenditureApi.updateExpenditure(currentEditId.value, formData);
+      await expenditureApi.updateExpenditure(
+        currentEditId.value,
+        formData.value
+      );
       ElMessage.success("更新成功");
     } else {
-      await expenditureApi.createExpenditure(formData);
+      console.log("Creating expenditure with data:", formData.value);
+      await expenditureApi.createExpenditure(formData.value);
       ElMessage.success("创建成功");
     }
 

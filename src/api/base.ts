@@ -1,7 +1,8 @@
 import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
-  type AxiosResponse
+  type AxiosResponse,
+  type InternalAxiosRequestConfig
 } from "axios";
 import type { ApiResponse } from "../types/api";
 import { getToken } from "../utils/auth"; // 假设 auth.ts 有 getToken 方法
@@ -12,7 +13,25 @@ export class ApiService {
   protected http: AxiosInstance;
 
   constructor(baseURL: string = "/api") {
-    this.baseURL = baseURL;
+    // 优先使用 Vite 提供的环境变量 VITE_API_BASE_URL（例如在 .env.development 中配置）
+    // 如果不存在则回退到传入的 baseURL 或默认的 "/api"
+    const viteBase =
+      typeof import.meta !== "undefined" && (import.meta as any).env
+        ? (import.meta as any).env.VITE_API_BASE_URL
+        : undefined;
+
+    // 拼接 baseURL：如果存在 VITE_API_BASE_URL，则将其与传入的 baseURL 拼接
+    if (viteBase) {
+      // 确保拼接时路径格式正确
+      const viteBaseTrimmed = viteBase.endsWith("/")
+        ? viteBase.slice(0, -1)
+        : viteBase;
+      const baseURLTrimmed = baseURL.startsWith("/") ? baseURL : `/${baseURL}`;
+      this.baseURL = `${viteBaseTrimmed}${baseURLTrimmed}`;
+    } else {
+      this.baseURL = baseURL;
+    }
+
     this.http = axios.create({
       baseURL: this.baseURL,
       timeout: 10000,
@@ -23,14 +42,18 @@ export class ApiService {
 
     // 请求拦截器：添加认证 token
     this.http.interceptors.request.use(
-      config => {
+      (config: InternalAxiosRequestConfig) => {
         const token = getToken();
         if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+          // 使用 any-cast 避免与 Axios 的复杂 headers 类型冲突
+          if (!config.headers) {
+            config.headers = {} as any;
+          }
+          (config.headers as any)["Authorization"] = `Bearer ${token}`;
         }
         return config;
       },
-      error => {
+      (error: any) => {
         return Promise.reject(error);
       }
     );

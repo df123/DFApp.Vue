@@ -8,7 +8,8 @@ import type {
   CreateUpdateBookkeepingExpenditureDto,
   GetExpendituresRequestDto,
   ChartJSDto,
-  GetChartDataRequestDto
+  GetChartDataRequestDto,
+  MonthlyExpenditureDto
 } from "@/types/api";
 
 class BookkeepingCategoryApi {
@@ -93,6 +94,16 @@ class BookkeepingExpenditureApi {
    */
   async getChartData(params: GetChartDataRequestDto): Promise<ChartJSDto> {
     return http.get(`${this.baseUrl}/chart-jSDto`, { params });
+  }
+
+  async getMonthlyExpenditure(year: number): Promise<MonthlyExpenditureDto> {
+    return http.request<MonthlyExpenditureDto>(
+      "get",
+      `${this.baseUrl}/monthly-expenditure`,
+      {
+        params: { year }
+      }
+    );
   }
 }
 

@@ -132,3 +132,14 @@ export interface GetChartDataRequestDto {
   numberType?: string;
   isBelongToSelf?: boolean | null;
 }
+
+// 月度支出 DTO
+export interface MonthlyExpenditureDto {
+  labels: string[];
+  totalData: number[];
+  selfData: number[];
+  nonSelfData: number[];
+  totalAverage: number;
+  selfAverage: number;
+  nonSelfAverage: number;
+}

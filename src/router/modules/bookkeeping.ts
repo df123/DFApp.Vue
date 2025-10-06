@@ -3,7 +3,6 @@ import type { RouteRecordRaw } from "vue-router";
 const bookkeeping: RouteRecordRaw = {
   path: "/bookkeeping",
   name: "Bookkeeping",
-  component: () => import("@/views/bookkeeping/index.vue"),
   meta: {
     title: "记账管理",
     icon: "ep:notebook",

@@ -14,7 +14,7 @@ export interface OidcConfig {
 }
 
 export const oidcConfig: OidcConfig = {
-  authority: "https://localhost:44369",
+  authority: import.meta.env.VITE_AUTH_AUTHORITY || "",
   client_id: import.meta.env.VITE_OAUTH_CLIENT_ID || "",
   redirect_uri: `${window.location.origin}/auth/callback`,
   post_logout_redirect_uri: `${window.location.origin}/signout-callback-oidc`,

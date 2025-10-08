@@ -3,7 +3,7 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <span>彩票购买</span>
+          <span class="card-title">彩票购买</span>
           <el-button
             v-if="hasCreatePermission"
             type="primary"
@@ -15,81 +15,77 @@
         </div>
       </template>
 
-      <el-table
-        v-loading="loading"
-        :data="tableData"
-        style="width: 100%"
-        stripe
-        border
-        @sort-change="handleSortChange"
-      >
-        <el-table-column label="操作" width="150" fixed="left">
-          <template #default="scope">
-            <el-button
-              v-if="hasEditPermission"
-              link
-              type="primary"
-              size="small"
-              @click="handleEdit(scope.row)"
-            >
-              编辑
-            </el-button>
-            <el-button
-              v-if="hasDeletePermission"
-              link
-              type="danger"
-              size="small"
-              @click="handleDelete(scope.row)"
-            >
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-
-        <el-table-column
-          prop="indexNo"
-          label="期号"
-          sortable="custom"
-          min-width="120"
-        />
-
-        <el-table-column
-          prop="lotteryType"
-          label="彩票类型"
-          sortable="custom"
-          min-width="120"
-        />
-
-        <el-table-column prop="redNumbers" label="红球号码" min-width="150">
-          <template #default="scope">
-            <span class="red-number">{{ scope.row.redNumbers }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="blueNumber" label="蓝球号码" min-width="100">
-          <template #default="scope">
-            <span class="blue-number">{{ scope.row.blueNumber }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column
-          prop="groupId"
-          label="组号"
-          sortable="custom"
-          min-width="100"
-        />
-
-        <el-table-column
-          prop="creationTime"
-          label="创建时间"
-          sortable="custom"
-          min-width="180"
+      <!-- 数据表格 -->
+      <div class="table-container">
+        <el-table
+          v-loading="loading"
+          :data="tableData"
+          style="width: 100%"
+          stripe
+          @sort-change="handleSortChange"
         >
-          <template #default="scope">
-            {{ formatDateTime(scope.row.creationTime) }}
-          </template>
-        </el-table-column>
-      </el-table>
+          <el-table-column
+            prop="indexNo"
+            label="期号"
+            sortable="custom"
+            width="120"
+          />
+          <el-table-column
+            prop="lotteryType"
+            label="彩票类型"
+            sortable="custom"
+            width="120"
+          />
+          <el-table-column prop="redNumbers" label="红球号码" min-width="150">
+            <template #default="scope">
+              <span class="red-number">{{ scope.row.redNumbers }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="blueNumber" label="蓝球号码" min-width="100">
+            <template #default="scope">
+              <span class="blue-number">{{ scope.row.blueNumber }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="groupId"
+            label="组号"
+            sortable="custom"
+            min-width="100"
+          />
+          <el-table-column
+            prop="creationTime"
+            label="创建时间"
+            sortable="custom"
+            min-width="180"
+          >
+            <template #default="scope">
+              {{ formatDateTime(scope.row.creationTime) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" fixed="right" width="120">
+            <template #default="scope">
+              <el-button
+                v-if="hasEditPermission"
+                size="small"
+                type="primary"
+                link
+                @click="handleEdit(scope.row)"
+              >
+                编辑
+              </el-button>
+              <el-button
+                v-if="hasDeletePermission"
+                size="small"
+                type="danger"
+                link
+                @click="handleDelete(scope.row)"
+              >
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
 
       <div class="pagination-container">
         <el-pagination
@@ -246,6 +242,17 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
 }
 
 .pagination-container {

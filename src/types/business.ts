@@ -218,6 +218,7 @@ export interface LotteryResultDto {
   msg: string;
   z2Add: string;
   m2Add: string;
+  creationTime?: string;
   prizegrades: Array<{
     type: number;
     typeNum: string;

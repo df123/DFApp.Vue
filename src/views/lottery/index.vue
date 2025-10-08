@@ -7,9 +7,9 @@
           <el-button
             v-if="hasCreatePermission"
             type="primary"
-            icon="Plus"
             @click="handleCreate"
           >
+            <el-icon><Plus /></el-icon>
             添加
           </el-button>
         </div>
@@ -100,6 +100,72 @@
       </div>
     </el-card>
 
+    <!-- 创建/编辑对话框 -->
+    <el-dialog
+      v-model="formDialogVisible"
+      :title="formDialogTitle"
+      width="600px"
+      :close-on-click-modal="false"
+    >
+      <div class="dialog-content">
+        <el-row>
+          <div class="botton-area select-area">
+            <el-select
+              v-model="formLotteryTypeValue"
+              class="m-2"
+              placeholder="彩票类型"
+            >
+              <el-option
+                v-for="item in formLotteryTypeItems"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </div>
+        </el-row>
+        <el-row>
+          <div
+            v-if="formLotteryTypeValue == 'ssq'"
+            class="margin-left-12"
+            style="margin-top: 10px"
+          >
+            <el-input
+              v-model="formData.indexNo"
+              class="m-1"
+              placeholder="期号"
+            />
+            <el-input v-model="formData.reds" class="m-1" placeholder="红球" />
+            <el-input v-model="formData.blues" class="m-1" placeholder="蓝球" />
+          </div>
+          <div v-if="formLotteryTypeValue != 'ssq'" class="margin-left-12">
+            <el-input
+              v-model="formData.indexNo"
+              class="m-1"
+              placeholder="期号"
+            />
+            <el-input
+              v-model="formData.reds"
+              class="m-1"
+              :rows="5"
+              type="textarea"
+              placeholder="红球"
+            />
+          </div>
+        </el-row>
+      </div>
+      <template #footer>
+        <el-button @click="formDialogVisible = false">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="formLoading"
+          @click="handleFormSubmit"
+        >
+          确认
+        </el-button>
+      </template>
+    </el-dialog>
+
     <!-- 删除确认对话框 -->
     <el-dialog v-model="deleteDialogVisible" title="确认删除" width="400px">
       <span>确定要删除这条记录吗？</span>
@@ -118,11 +184,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ref, reactive, onMounted, computed, nextTick } from "vue";
+import {
+  ElMessage,
+  ElMessageBox,
+  type FormInstance,
+  type FormRules
+} from "element-plus";
+import { Plus } from "@element-plus/icons-vue";
 import { lotteryApi } from "@/api/lottery";
 import type { PagedRequestDto, PagedResultDto } from "@/types/api";
-import type { LotteryGroupDto } from "@/types/business";
+import type {
+  LotteryGroupDto,
+  CreateUpdateLotteryDto,
+  ConstsDto
+} from "@/types/business";
+
+// 对话框相关数据
+const formLotteryTypeValue = ref("kl8");
+const formLotteryTypeItems = ref<{ value: string; label: string }[]>([]);
 
 // 响应式数据
 const loading = ref(false);
@@ -132,6 +212,33 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const sortField = ref("indexNo");
 const sortOrder = ref("desc");
+
+// 表单相关状态
+const formRef = ref<FormInstance>();
+const formDialogVisible = ref(false);
+const formLoading = ref(false);
+const formDialogTitle = ref("");
+const isEditMode = ref(false);
+const currentEditId = ref<number | null>(null);
+
+// 表单数据
+const formData = reactive({
+  indexNo: "",
+  reds: "",
+  blues: ""
+});
+
+// 表单验证规则
+const formRules: FormRules = {
+  indexNo: [
+    { required: true, message: "请输入期号", trigger: "blur" },
+    { type: "number", min: 1, message: "期号必须大于0", trigger: "blur" }
+  ],
+  lotteryType: [
+    { required: true, message: "请选择彩票类型", trigger: "change" }
+  ],
+  number: [{ required: true, message: "请输入号码", trigger: "blur" }]
+};
 
 // 删除相关状态
 const deleteDialogVisible = ref(false);
@@ -188,13 +295,30 @@ const handleSortChange = (sort: any) => {
 
 // 操作处理
 const handleCreate = () => {
-  // 这里需要实现创建模态框的逻辑
-  ElMessage.info("创建功能待实现");
+  resetForm();
+  isEditMode.value = false;
+  formDialogTitle.value = "添加彩票记录";
+  formDialogVisible.value = true;
 };
 
 const handleEdit = (row: LotteryGroupDto) => {
-  // 这里需要实现编辑模态框的逻辑
-  ElMessage.info(`编辑记录 ID: ${row.id}`);
+  resetForm();
+  isEditMode.value = true;
+  formDialogTitle.value = "编辑彩票记录";
+  currentEditId.value = row.id!;
+
+  // 预填充表单数据
+  // 注意：由于表格显示的是分组后的数据，而编辑需要的是单条记录
+  // 这里需要根据实际情况获取单条记录的数据，目前先简单处理
+  Object.assign(formData, {
+    indexNo: row.indexNo,
+    lotteryType: row.lotteryType,
+    number: row.redNumbers || "", // 这里需要根据实际情况调整
+    colorType: "0", // 默认为红球
+    groupId: row.groupId
+  });
+
+  formDialogVisible.value = true;
 };
 
 const handleDelete = (row: LotteryGroupDto) => {
@@ -220,6 +344,113 @@ const confirmDelete = async () => {
   }
 };
 
+// 表单提交处理
+const handleFormSubmit = async () => {
+  try {
+    // 验证输入
+    if (
+      !isValidString(formData.indexNo) ||
+      !isValidString(formData.reds) ||
+      (formLotteryTypeValue.value === "ssq" && !isValidString(formData.blues))
+    ) {
+      ElMessage.error("输入有误");
+      return;
+    }
+
+    formLoading.value = true;
+
+    // 获取彩票类型信息
+    let lotteryType = formLotteryTypeItems.value.find(
+      item => item.value === formLotteryTypeValue.value
+    );
+    if (!lotteryType) {
+      ElMessage.error("未找到对应的彩票类型");
+      return;
+    }
+
+    let createDtos: CreateUpdateLotteryDto[] = [];
+
+    // 处理红球数据
+    let redGroups = formData.reds
+      .split(/\n+/)
+      .filter(group => group.trim() !== "");
+    redGroups.forEach((group, groupIndex) => {
+      let groupItems = group.split(/[\s,]+/).filter(item => item.trim() !== "");
+      groupItems.forEach(element => {
+        createDtos.push({
+          indexNo: parseInt(formData.indexNo),
+          number: element,
+          colorType: "0",
+          lotteryType: lotteryType.label,
+          groupId: groupIndex + 1
+        });
+      });
+    });
+
+    // 处理蓝球数据（仅双色球）
+    if (formLotteryTypeValue.value === "ssq") {
+      let blueGroups = formData.blues
+        .split(/\n+/)
+        .filter(group => group.trim() !== "");
+      blueGroups.forEach((group, groupIndex) => {
+        let groupItems = group
+          .split(/[\s,]+/)
+          .filter(item => item.trim() !== "");
+        groupItems.forEach(element => {
+          createDtos.push({
+            indexNo: parseInt(formData.indexNo),
+            number: element,
+            colorType: "1",
+            lotteryType: lotteryType.label,
+            groupId: groupIndex + 1
+          });
+        });
+      });
+    }
+
+    // 批量创建彩票记录
+    for (const dto of createDtos) {
+      if (isEditMode.value && currentEditId.value) {
+        // 编辑模式（这里需要根据实际情况调整，目前只支持创建）
+        await lotteryApi.createLottery(dto);
+      } else {
+        // 创建模式
+        await lotteryApi.createLottery(dto);
+      }
+    }
+
+    ElMessage.success(isEditMode.value ? "更新成功" : "创建成功");
+    formDialogVisible.value = false;
+    fetchTableData();
+  } catch (error) {
+    console.error("表单提交失败:", error);
+    ElMessage.error(isEditMode.value ? "更新失败" : "创建失败");
+  } finally {
+    formLoading.value = false;
+  }
+};
+
+// 字符串验证函数
+function isValidString(input: string | null | undefined): boolean {
+  if (input !== null && input !== undefined && input.trim() !== "") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// 重置表单
+const resetForm = () => {
+  formRef.value?.clearValidate();
+  Object.assign(formData, {
+    indexNo: "",
+    reds: "",
+    blues: ""
+  });
+  formLotteryTypeValue.value = "kl8";
+  currentEditId.value = null;
+};
+
 // 格式化日期时间
 const formatDateTime = (dateTime: string) => {
   if (!dateTime) return "";
@@ -227,7 +458,27 @@ const formatDateTime = (dateTime: string) => {
 };
 
 // 生命周期
-onMounted(() => {
+onMounted(async () => {
+  // 获取彩票常量
+  try {
+    const consts: ConstsDto = await lotteryApi.getLotteryConsts();
+    if (consts && consts.lotteryTypes) {
+      consts.lotteryTypes.forEach((item: any) => {
+        formLotteryTypeItems.value.push({
+          value: item.lotteryTypeEng,
+          label: item.lotteryType
+        });
+      });
+    }
+  } catch (error) {
+    console.error("获取彩票常量失败:", error);
+    // 设置默认值
+    formLotteryTypeItems.value = [
+      { value: "ssq", label: "双色球" },
+      { value: "kl8", label: "快乐8" }
+    ];
+  }
+
   fetchTableData();
 });
 </script>
@@ -269,5 +520,32 @@ onMounted(() => {
 .blue-number {
   font-weight: bold;
   color: #409eff;
+}
+
+.botton-area {
+  display: flex;
+  margin-left: unset;
+  font-weight: bold;
+}
+
+.select-area {
+  width: 100%;
+}
+
+.margin-left-12 {
+  margin-right: 1.1rem;
+  margin-left: 0.375rem;
+}
+
+.m-1 {
+  margin: 0.25rem;
+}
+
+.m-2 {
+  margin: 0.5rem;
+}
+
+.dialog-content {
+  padding: 10px 0;
 }
 </style>

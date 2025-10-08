@@ -258,7 +258,8 @@ export interface LotteryCombinationDto {
 
 // 彩票常量 DTO
 export interface ConstsDto {
-  [key: string]: any;
+  lotteryTypeEng: string;
+  lotteryType: string;
 }
 
 // 彩票模拟相关类型
@@ -276,13 +277,15 @@ export interface StatisticsDto {
 
 // 中奖统计查询参数
 export interface StatisticsWinRequestDto extends PagedRequestDto {
-  purchasedPeriod?: number;
-  winningPeriod?: number;
+  purchasedPeriod?: string;
+  winningPeriod?: string;
   lotteryType?: string;
 }
 
 export interface StatisticsWinItemDto {
-  [key: string]: any;
+  code: string;
+  buyAmount: number;
+  winAmount: number;
 }
 
 // Telegram 模块类型

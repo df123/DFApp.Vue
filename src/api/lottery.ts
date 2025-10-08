@@ -58,9 +58,20 @@ export class LotteryApi {
     return http.post("/api/app/lottery-grouped", { data: request });
   }
 
-  // GET /api/app/lottery/consts
-  async getLotteryConsts(): Promise<ConstsDto> {
-    return http.get("/api/app/lottery/consts");
+  // GET /api/app/lottery/const
+  async getLotteryConsts(): Promise<ConstsDto[]> {
+    return http.get(`${this.baseUrl}/lottery-const`);
+  }
+
+  // GET /api/app/lottery/statistics-win
+  async getStatisticsWin(
+    purchasedPeriod?: string,
+    winningPeriod?: string,
+    lotteryType?: string
+  ): Promise<StatisticsWinItemDto[]> {
+    return http.get(`${this.baseUrl}/statistics-win`, {
+      params: { purchasedPeriod, winningPeriod, lotteryType }
+    });
   }
 }
 

@@ -1,4 +1,4 @@
-import ApiService from "./base";
+import { http } from "@/utils/http";
 import type { PagedRequestDto, PagedResultDto } from "../types/api";
 import type {
   LotteryDto,
@@ -16,21 +16,19 @@ import type {
 } from "../types/business";
 
 // 彩票基础 API
-export class LotteryApi extends ApiService {
-  constructor() {
-    super("/api");
-  }
+export class LotteryApi {
+  private baseUrl = "/api/app/lottery";
 
   // GET /api/app/lottery
   async getLotteries(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<LotteryDto>> {
-    return this.get("/app/lottery", params);
+    return http.get(this.baseUrl, { params });
   }
 
   // POST /api/app/lottery
   async createLottery(request: CreateUpdateLotteryDto): Promise<LotteryDto> {
-    return this.post("/app/lottery", request);
+    return http.post(this.baseUrl, { data: request });
   }
 
   // PUT /api/app/lottery/{id}
@@ -38,52 +36,50 @@ export class LotteryApi extends ApiService {
     id: number,
     request: CreateUpdateLotteryDto
   ): Promise<LotteryDto> {
-    return this.put(`/app/lottery/${id}`, request);
+    return http.request("put", `${this.baseUrl}/${id}`, { data: request });
   }
 
   // DELETE /api/app/lottery/{id}
   async deleteLottery(id: number): Promise<void> {
-    return this.delete(`/app/lottery/${id}`);
+    return http.request("delete", `${this.baseUrl}/${id}`);
   }
 
   // GET /api/app/lottery-grouped
   async getLotteryGroups(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<LotteryGroupDto>> {
-    return this.get("/app/lottery-grouped", params);
+    return http.get(`${this.baseUrl}/grouped`, { params });
   }
 
   // POST /api/app/lottery-grouped
   async createLotteryGroup(
     request: CreateUpdateLotteryDto
   ): Promise<LotteryGroupDto> {
-    return this.post("/app/lottery-grouped", request);
+    return http.post("/api/app/lottery-grouped", { data: request });
   }
 
   // GET /api/app/lottery/consts
   async getLotteryConsts(): Promise<ConstsDto> {
-    return this.get("/app/lottery/consts");
+    return http.get("/api/app/lottery/consts");
   }
 }
 
 // 彩票结果 API
-export class LotteryResultApi extends ApiService {
-  constructor() {
-    super("/api");
-  }
+export class LotteryResultApi {
+  private baseUrl = "/api/app/lottery-result";
 
   // GET /api/app/lottery-result
   async getLotteryResults(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<LotteryResultDto>> {
-    return this.get("/app/lottery-result", params);
+    return http.get(this.baseUrl, { params });
   }
 
   // POST /api/app/lottery-result
   async createLotteryResult(
     request: CreateUpdateLotteryResultDto
   ): Promise<LotteryResultDto> {
-    return this.post("/app/lottery-result", request);
+    return http.post(this.baseUrl, { data: request });
   }
 
   // PUT /api/app/lottery-result/{id}
@@ -91,71 +87,69 @@ export class LotteryResultApi extends ApiService {
     id: number,
     request: CreateUpdateLotteryResultDto
   ): Promise<LotteryResultDto> {
-    return this.put(`/app/lottery-result/${id}`, request);
+    return http.request("put", `${this.baseUrl}/${id}`, { data: request });
   }
 
   // DELETE /api/app/lottery-result/{id}
   async deleteLotteryResult(id: number): Promise<void> {
-    return this.delete(`/app/lottery-result/${id}`);
+    return http.request("delete", `${this.baseUrl}/${id}`);
   }
 }
 
 // 彩票模拟 API
-export class LotterySimulationApi extends ApiService {
-  constructor() {
-    super("/api");
-  }
+export class LotterySimulationApi {
+  private baseUrl = "/api/app/lottery/simulation";
 
   // POST /api/app/lottery/simulation/kl8
   async generateKL8Simulation(
     request: GenerateRandomNumbersDto
   ): Promise<LotterySimulationDto> {
-    return this.post("/app/lottery/simulation/kl8", request);
+    return http.post(`${this.baseUrl}/kl8`, { data: request });
   }
 
   // GET /api/app/lottery/simulation/kl8/statistics
   async getKL8Statistics(termNumber?: number): Promise<StatisticsDto> {
-    return this.get("/app/lottery/simulation/kl8/statistics", { termNumber });
+    return http.get(`${this.baseUrl}/kl8/statistics`, {
+      params: { termNumber }
+    });
   }
 
   // POST /api/app/lottery/simulation/ssq
   async generateSSQSimulation(
     request: GenerateRandomNumbersDto
   ): Promise<LotterySimulationDto> {
-    return this.post("/app/lottery/simulation/ssq", request);
+    return http.post(`${this.baseUrl}/ssq`, { data: request });
   }
 
   // GET /api/app/lottery/simulation/ssq/statistics
   async getSSQStatistics(termNumber?: number): Promise<StatisticsDto> {
-    return this.get("/app/lottery/simulation/ssq/statistics", { termNumber });
+    return http.get(`${this.baseUrl}/ssq/statistics`, {
+      params: { termNumber }
+    });
   }
 }
 
 // 彩票统计 API
-export class LotteryStatisticsApi extends ApiService {
-  constructor() {
-    super("/api");
-  }
+export class LotteryStatisticsApi {
+  private baseUrl = "/api/app/lottery/statistics-win";
 
   // GET /api/app/lottery/statistics-win
   async getWinStatistics(
     params?: StatisticsWinRequestDto
   ): Promise<PagedResultDto<StatisticsWinItemDto>> {
-    return this.get("/app/lottery/statistics-win", params);
+    return http.get(this.baseUrl, { params });
   }
 }
 
 // 彩票组合 API
-export class LotteryCombinationApi extends ApiService {
-  constructor() {
-    super("/api");
-  }
+export class LotteryCombinationApi {
+  private baseUrl = "/api/app/lottery-combination";
 
   // POST /api/app/lottery-combination
   async generateCombination(
     request: LotteryCombinationDto
   ): Promise<LotteryCombinationDto> {
-    return this.post("/app/lottery-combination", request);
+    return http.post(this.baseUrl, { data: request });
   }
 }
 

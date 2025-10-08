@@ -3,7 +3,6 @@ import type { RouteRecordRaw } from "vue-router";
 const lottery: RouteRecordRaw = {
   path: "/lottery",
   name: "Lottery",
-  component: () => import("@/views/lottery/index.vue"),
   meta: {
     title: "彩票管理",
     icon: "ep:pie-chart",
@@ -11,11 +10,19 @@ const lottery: RouteRecordRaw = {
   },
   children: [
     {
-      path: "lottery-data",
-      name: "LotteryData",
+      path: "buy",
+      name: "LotteryBuy",
       component: () => import("@/views/lottery/index.vue"),
       meta: {
-        title: "彩票数据管理"
+        title: "彩票购买"
+      }
+    },
+    {
+      path: "result",
+      name: "LotteryResult",
+      component: () => import("@/views/lottery/result/index.vue"),
+      meta: {
+        title: "开奖结果"
       }
     },
     {
@@ -27,8 +34,16 @@ const lottery: RouteRecordRaw = {
       }
     },
     {
+      path: "statistics-item",
+      name: "LotteryStatisticsItem",
+      component: () => import("@/views/lottery/statistics-item/index.vue"),
+      meta: {
+        title: "统计项管理"
+      }
+    },
+    {
       path: "simulation/ssq",
-      name: "SSQSimulation",
+      name: "LotterySimulation",
       component: () => import("@/views/lottery/simulation/ssq/index.vue"),
       meta: {
         title: "双色球模拟"
@@ -36,7 +51,7 @@ const lottery: RouteRecordRaw = {
     },
     {
       path: "simulation/kl8",
-      name: "KL8Simulation",
+      name: "LotteryK8",
       component: () => import("@/views/lottery/simulation/kl8/index.vue"),
       meta: {
         title: "快乐8模拟"

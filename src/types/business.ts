@@ -1,4 +1,4 @@
-import type { PagedRequestDto } from "./api";
+import type { PagedRequestDto, PagedResultDto } from "./api";
 
 // Aria2 模块类型
 
@@ -264,15 +264,42 @@ export interface ConstsDto {
 
 // 彩票模拟相关类型
 export interface GenerateRandomNumbersDto {
-  [key: string]: any;
+  count: number;
+  gameType: LotteryGameType;
+  termNumber: number;
 }
 
 export interface LotterySimulationDto {
-  [key: string]: any;
+  id: string;
+  termNumber: number;
+  redNumbers: string;
+  blueNumber: string;
+  ballType: LotteryBallType;
+  gameType: LotteryGameType;
+  groupId: number;
+  creationTime?: string;
 }
 
 export interface StatisticsDto {
-  [key: string]: any;
+  terms: number[];
+  purchaseAmounts: number[];
+  winningAmounts: number[];
+}
+
+export interface DeleteByTermNumberDto {
+  termNumber: number;
+}
+
+// 彩票球类型枚举
+export enum LotteryBallType {
+  Red = 0,
+  Blue = 1
+}
+
+// 彩票游戏类型枚举
+export enum LotteryGameType {
+  双色球 = 0,
+  快乐8 = 1
 }
 
 // 中奖统计查询参数
@@ -296,6 +323,9 @@ export interface StatisticsWinItemRequestDto extends PagedRequestDto {
   winningPeriod?: string;
   lotteryType?: string;
 }
+
+// 重新导出API类型
+export type { PagedRequestDto, PagedResultDto };
 
 // Telegram 模块类型
 

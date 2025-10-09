@@ -13,7 +13,8 @@ import type {
   StatisticsWinRequestDto,
   StatisticsWinItemDto,
   StatisticsWinItemRequestDto,
-  LotteryCombinationDto
+  LotteryCombinationDto,
+  DeleteByTermNumberDto
 } from "../types/business";
 
 // 彩票基础 API
@@ -117,7 +118,34 @@ export class LotteryResultApi {
 
 // 彩票模拟 API
 export class LotterySimulationApi {
-  private baseUrl = "/api/app/lottery/simulation";
+  private baseUrl = "/api/app/lottery-sSQSimulation";
+
+  async getSSQSimulations(
+    params?: PagedRequestDto
+  ): Promise<PagedResultDto<LotterySimulationDto>> {
+    return http.get(this.baseUrl, { params });
+  }
+
+  async generateSSQSimulation(
+    request: GenerateRandomNumbersDto
+  ): Promise<LotterySimulationDto> {
+    return http.post(`${this.baseUrl}/generate-random-numbers`, {
+      data: request
+    });
+  }
+
+  async deleteSSQByTermNumber(request: DeleteByTermNumberDto): Promise<void> {
+    return http.request(
+      "delete",
+      `${this.baseUrl}/by-term-number?termNumber=${request.termNumber}`
+    );
+  }
+
+  async getSSQStatistics(termNumber?: number): Promise<StatisticsDto> {
+    return http.get(`${this.baseUrl}/statistics`, {
+      params: { termNumber }
+    });
+  }
 
   // POST /api/app/lottery/simulation/kl8
   async generateKL8Simulation(
@@ -129,20 +157,6 @@ export class LotterySimulationApi {
   // GET /api/app/lottery/simulation/kl8/statistics
   async getKL8Statistics(termNumber?: number): Promise<StatisticsDto> {
     return http.get(`${this.baseUrl}/kl8/statistics`, {
-      params: { termNumber }
-    });
-  }
-
-  // POST /api/app/lottery/simulation/ssq
-  async generateSSQSimulation(
-    request: GenerateRandomNumbersDto
-  ): Promise<LotterySimulationDto> {
-    return http.post(`${this.baseUrl}/ssq`, { data: request });
-  }
-
-  // GET /api/app/lottery/simulation/ssq/statistics
-  async getSSQStatistics(termNumber?: number): Promise<StatisticsDto> {
-    return http.get(`${this.baseUrl}/ssq/statistics`, {
       params: { termNumber }
     });
   }

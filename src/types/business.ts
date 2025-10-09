@@ -273,7 +273,7 @@ export interface LotterySimulationDto {
   id: string;
   termNumber: number;
   redNumbers: string;
-  blueNumber: string;
+  blueNumber?: string;
   ballType: LotteryBallType;
   gameType: LotteryGameType;
   groupId: number;
@@ -284,6 +284,22 @@ export interface StatisticsDto {
   terms: number[];
   purchaseAmounts: number[];
   winningAmounts: number[];
+  purchaseAmountsByType?: Record<LotteryKL8PlayType, number[]>;
+  winningAmountsByType?: Record<LotteryKL8PlayType, number[]>;
+}
+
+// KL8 中奖统计 DTO
+export interface WinningStatisticsDto {
+  totalAmount: number;
+  winningDetails?: WinningDetailDto[];
+}
+
+// KL8 中奖详情 DTO
+export interface WinningDetailDto {
+  groupId: number;
+  redMatches: number;
+  blueMatches: number;
+  winningAmount: number;
 }
 
 export interface DeleteByTermNumberDto {
@@ -300,6 +316,20 @@ export enum LotteryBallType {
 export enum LotteryGameType {
   双色球 = 0,
   快乐8 = 1
+}
+
+// KL8 玩法类型枚举
+export enum LotteryKL8PlayType {
+  Select1 = 1, // 选一
+  Select2 = 2, // 选二
+  Select3 = 3, // 选三
+  Select4 = 4, // 选四
+  Select5 = 5, // 选五
+  Select6 = 6, // 选六
+  Select7 = 7, // 选七
+  Select8 = 8, // 选八
+  Select9 = 9, // 选九
+  Select10 = 10 // 选十
 }
 
 // 中奖统计查询参数

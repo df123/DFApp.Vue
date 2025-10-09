@@ -14,7 +14,8 @@ import type {
   StatisticsWinItemDto,
   StatisticsWinItemRequestDto,
   LotteryCombinationDto,
-  DeleteByTermNumberDto
+  DeleteByTermNumberDto,
+  WinningStatisticsDto
 } from "../types/business";
 
 // 彩票基础 API
@@ -146,19 +147,73 @@ export class LotterySimulationApi {
       params: { termNumber }
     });
   }
+}
 
-  // POST /api/app/lottery/simulation/kl8
-  async generateKL8Simulation(
-    request: GenerateRandomNumbersDto
-  ): Promise<LotterySimulationDto> {
-    return http.post(`${this.baseUrl}/kl8`, { data: request });
+// KL8 彩票模拟 API
+export class LotteryKL8SimulationApi {
+  private baseUrl = "/api/app/lottery-kL8Simulation";
+
+  // GET /api/app/lottery-kL8Simulation
+  async getKL8Simulations(
+    params?: PagedRequestDto
+  ): Promise<PagedResultDto<LotterySimulationDto>> {
+    return http.get(this.baseUrl, { params });
   }
 
-  // GET /api/app/lottery/simulation/kl8/statistics
-  async getKL8Statistics(termNumber?: number): Promise<StatisticsDto> {
-    return http.get(`${this.baseUrl}/kl8/statistics`, {
-      params: { termNumber }
+  // POST /api/app/lottery-kL8Simulation
+  async createKL8Simulation(
+    request: CreateUpdateLotteryDto
+  ): Promise<LotterySimulationDto> {
+    return http.post(this.baseUrl, { data: request });
+  }
+
+  // PUT /api/app/lottery-kL8Simulation/{id}
+  async updateKL8Simulation(
+    id: string,
+    request: CreateUpdateLotteryDto
+  ): Promise<LotterySimulationDto> {
+    return http.request("put", `${this.baseUrl}/${id}`, { data: request });
+  }
+
+  // DELETE /api/app/lottery-kL8Simulation/{id}
+  async deleteKL8Simulation(id: string): Promise<void> {
+    return http.request("delete", `${this.baseUrl}/${id}`);
+  }
+
+  // DELETE /api/app/lottery-kL8Simulation/by-term-number
+  async deleteKL8ByTermNumber(request: DeleteByTermNumberDto): Promise<void> {
+    return http.request(
+      "delete",
+      `${this.baseUrl}/by-term-number?termNumber=${request.termNumber}`
+    );
+  }
+
+  // GET /api/app/lottery-kL8Simulation/statistics
+  async getKL8Statistics(): Promise<StatisticsDto> {
+    return http.get(`${this.baseUrl}/statistics`);
+  }
+
+  // POST /api/app/lottery-kL8Simulation/generate-random-numbers
+  async generateKL8Simulation(
+    request: GenerateRandomNumbersDto
+  ): Promise<boolean> {
+    return http.post(`${this.baseUrl}/generate-random-numbers`, {
+      data: request
     });
+  }
+
+  // POST /api/app/lottery-kL8Simulation/calculate-winning-amount
+  async calculateKL8WinningAmount(
+    termNumber: number
+  ): Promise<WinningStatisticsDto> {
+    return http.post(
+      `${this.baseUrl}/calculate-winning-amount?termNumber=${termNumber}`
+    );
+  }
+
+  // GET /api/app/lottery-kL8Simulation/{id}
+  async getKL8SimulationById(id: string): Promise<LotterySimulationDto> {
+    return http.get(`${this.baseUrl}/${id}`);
   }
 }
 
@@ -190,6 +245,7 @@ export class LotteryCombinationApi {
 export const lotteryApi = new LotteryApi();
 export const lotteryResultApi = new LotteryResultApi();
 export const lotterySimulationApi = new LotterySimulationApi();
+export const lotteryKL8SimulationApi = new LotteryKL8SimulationApi();
 export const lotteryStatisticsApi = new LotteryStatisticsApi();
 export const lotteryCombinationApi = new LotteryCombinationApi();
 
@@ -197,6 +253,7 @@ export default {
   lottery: lotteryApi,
   result: lotteryResultApi,
   simulation: lotterySimulationApi,
+  kl8Simulation: lotteryKL8SimulationApi,
   statistics: lotteryStatisticsApi,
   combination: lotteryCombinationApi
 };

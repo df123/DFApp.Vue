@@ -53,7 +53,13 @@
           <el-empty description="暂无统计数据" />
         </div>
         <div v-else class="chart-wrapper">
-          <canvas id="statisticsChart" ref="chartCanvas" />
+          <canvas
+            id="statistics-chart"
+            ref="chartCanvas"
+            class="statistics-chart"
+            width="400"
+            height="400"
+          />
         </div>
       </div>
     </el-card>
@@ -136,6 +142,7 @@ const updateChart = async () => {
 
     statisticsData.value = Array.isArray(data) ? data : [];
 
+    // 确保 DOM 更新完成后再渲染图表
     await nextTick();
     renderChart();
   } catch (error) {
@@ -147,72 +154,121 @@ const updateChart = async () => {
 
 // 渲染图表
 const renderChart = () => {
-  if (!chartCanvas.value || statisticsData.value.length === 0) {
-    return;
-  }
+  // 等待一小段时间确保 DOM 完全更新
+  setTimeout(() => {
+    // 使用 document.getElementById 作为备用方案
+    const canvasElement =
+      chartCanvas.value ||
+      (document.getElementById("statistics-chart") as HTMLCanvasElement);
 
-  // 销毁现有图表
-  if (chart) {
-    chart.destroy();
-  }
-
-  const labels = statisticsData.value.map(item => item.code);
-  const buyData = statisticsData.value.map(item => item.buyAmount);
-  const winData = statisticsData.value.map(item => item.winAmount);
-
-  const ctx = chartCanvas.value.getContext("2d");
-  if (!ctx) return;
-
-  chart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: "购买金额",
-          data: buyData,
-          backgroundColor: "rgba(54, 162, 235, 0.5)",
-          borderColor: "rgba(54, 162, 235, 1)",
-          borderWidth: 1
-        },
-        {
-          label: "中奖金额",
-          data: winData,
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
-          borderColor: "rgba(255, 99, 132, 1)",
-          borderWidth: 1
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "金额"
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: "期号"
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          position: "top"
-        },
-        title: {
-          display: true,
-          text: "彩票购买与中奖金额统计"
-        }
-      }
+    if (!canvasElement) {
+      console.error("Canvas 元素未找到");
+      return;
     }
-  });
+
+    if (statisticsData.value.length === 0) {
+      return;
+    }
+
+    // 销毁现有图表
+    if (chart) {
+      chart.destroy();
+    }
+
+    const labels = statisticsData.value.map(item => item.code);
+    const buyData = statisticsData.value.map(item => item.buyAmount);
+    const winData = statisticsData.value.map(item => item.winAmount);
+
+    const ctx = canvasElement.getContext("2d");
+    if (!ctx) {
+      console.error("无法获取 Canvas 上下文");
+      return;
+    }
+
+    try {
+      chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "购买金额",
+              data: buyData,
+              backgroundColor: "rgba(54, 162, 235, 0.8)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 2,
+              borderRadius: 5
+            },
+            {
+              label: "中奖金额",
+              data: winData,
+              backgroundColor: "rgba(255, 99, 132, 0.8)",
+              borderColor: "rgba(255, 99, 132, 1)",
+              borderWidth: 2,
+              borderRadius: 5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: "金额"
+              },
+              ticks: {
+                callback: function (value) {
+                  return "¥" + value;
+                }
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: "期号"
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                font: {
+                  size: 14
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: "彩票购买与中奖金额统计",
+              font: {
+                size: 16
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  let label = context.dataset.label || "";
+                  if (label) {
+                    label += ": ";
+                  }
+                  if (context.parsed.y !== null) {
+                    label += "¥" + context.parsed.y;
+                  }
+                  return label;
+                }
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error("图表渲染失败:", error);
+    }
+  }, 100);
 };
 
 // 验证字符串是否有效
@@ -276,7 +332,20 @@ onUnmounted(() => {
 }
 
 .chart-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
+}
+
+.statistics-chart {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 </style>

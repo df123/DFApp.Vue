@@ -70,16 +70,6 @@
             sortable="custom"
             width="100"
           />
-          <el-table-column
-            prop="creationTime"
-            label="创建时间"
-            sortable="custom"
-            min-width="180"
-          >
-            <template #default="scope">
-              {{ formatDateTime(scope.row.creationTime) }}
-            </template>
-          </el-table-column>
         </el-table>
 
         <!-- 分页 -->
@@ -240,7 +230,7 @@ const loading = ref(false);
 const tableData = ref<LotterySimulationDto[]>([]);
 const pagination = reactive({
   currentPage: 1,
-  pageSize: 20,
+  pageSize: 10,
   total: 0
 });
 const sortField = ref<string>("");

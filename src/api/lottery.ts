@@ -12,6 +12,7 @@ import type {
   StatisticsDto,
   StatisticsWinRequestDto,
   StatisticsWinItemDto,
+  StatisticsWinItemRequestDto,
   LotteryCombinationDto
 } from "../types/business";
 
@@ -72,6 +73,13 @@ export class LotteryApi {
     return http.get(`${this.baseUrl}/statistics-win`, {
       params: { purchasedPeriod, winningPeriod, lotteryType }
     });
+  }
+
+  // GET /api/app/lottery/statistics-win-item
+  async getStatisticsWinItem(
+    params?: StatisticsWinItemRequestDto
+  ): Promise<PagedResultDto<StatisticsWinItemDto>> {
+    return http.get(`${this.baseUrl}/statistics-win-item`, { params });
   }
 }
 

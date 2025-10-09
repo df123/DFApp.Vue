@@ -284,8 +284,17 @@ export interface StatisticsWinRequestDto extends PagedRequestDto {
 
 export interface StatisticsWinItemDto {
   code: string;
-  buyAmount: number;
+  winCode: string;
+  buyLotteryString: string;
+  winLotteryString: string;
   winAmount: number;
+}
+
+// 彩票统计项查询参数
+export interface StatisticsWinItemRequestDto extends PagedRequestDto {
+  purchasedPeriod?: string;
+  winningPeriod?: string;
+  lotteryType?: string;
 }
 
 // Telegram 模块类型

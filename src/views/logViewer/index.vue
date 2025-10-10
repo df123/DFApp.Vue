@@ -232,7 +232,25 @@ onUnmounted(() => {
 
 <style scoped>
 .log-viewer-container {
-  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  padding: 12px;
+}
+
+.log-viewer-container :deep(.el-card) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.log-viewer-container :deep(.el-card__body) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 12px;
+  overflow: hidden;
 }
 
 .card-header {
@@ -247,11 +265,29 @@ onUnmounted(() => {
 }
 
 .log-viewer-content {
-  margin-top: 20px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.log-viewer-content :deep(.el-row) {
+  height: 100%;
+}
+
+.log-viewer-content :deep(.el-col) {
+  height: 100%;
 }
 
 .file-list-card {
-  height: calc(100vh - 200px);
+  height: 100%;
+}
+
+.file-list-card :deep(.el-card__body) {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 57px);
+  padding: 0;
 }
 
 .file-list-header {
@@ -259,7 +295,7 @@ onUnmounted(() => {
 }
 
 .file-list {
-  height: calc(100% - 60px);
+  flex: 1;
   overflow-y: auto;
 }
 
@@ -267,17 +303,17 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 200px;
+  height: 100%;
 }
 
 .file-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
+  padding: 10px 12px;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
-  border-radius: 4px;
+  border-radius: 0;
   transition: background-color 0.2s;
 }
 
@@ -297,6 +333,7 @@ onUnmounted(() => {
 
 .file-name {
   margin-bottom: 4px;
+  font-size: 13px;
   font-weight: 500;
   word-break: break-all;
 }
@@ -304,7 +341,7 @@ onUnmounted(() => {
 .file-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 11px;
   color: #999;
 }
 
@@ -313,16 +350,26 @@ onUnmounted(() => {
 }
 
 .log-content-card {
-  height: calc(100vh - 200px);
+  height: 100%;
+}
+
+.log-content-card :deep(.el-card__body) {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 57px);
+  padding: 0;
 }
 
 .log-content-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .current-file-name {
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -333,22 +380,23 @@ onUnmounted(() => {
 }
 
 .log-content {
-  height: calc(100% - 60px);
+  flex: 1;
+  padding: 12px;
   overflow: hidden;
 }
 
 .log-text {
   height: 100%;
-  padding: 15px;
+  padding: 12px;
   margin: 0;
   overflow-y: auto;
   font-family: "Courier New", monospace;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.4;
   word-break: break-all;
   white-space: pre-wrap;
   background-color: #f8f9fa;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 
 .empty-content {

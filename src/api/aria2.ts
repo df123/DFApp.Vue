@@ -1,4 +1,4 @@
-import ApiService from "./base";
+import { http } from "@/utils/http";
 import type { PagedRequestDto, PagedResultDto } from "../types/api";
 import type {
   TellStatusResultDto,
@@ -7,32 +7,41 @@ import type {
   ExternalLinkResponseDto
 } from "../types/business";
 
-// Aria2 管理 API
-export class Aria2Api extends ApiService {
-  constructor() {
-    super("/api");
-  }
+class Aria2Api {
+  private baseUrl = "/api/app/aria2";
 
-  // GET /api/app/aria2 - 获取下载状态
+  /**
+   * 获取下载状态
+   */
   async getAria2Status(
     params?: PagedRequestDto & { filter?: string }
   ): Promise<PagedResultDto<TellStatusResultDto>> {
-    return this.get("/app/aria2", params);
+    return http.get(this.baseUrl, { params });
   }
 
-  // POST /api/app/aria2 - 添加下载
+  /**
+   * 添加下载
+   */
   async addDownload(
     request: AddDownloadRequestDto
   ): Promise<AddDownloadResponseDto> {
-    return this.post("/app/aria2", request);
+    return http.post(this.baseUrl, { data: request });
   }
 
-  // GET /api/app/aria2/{id}/external-link - 获取外部链接
+  /**
+   * 获取外部链接
+   */
   async getExternalLink(id: number): Promise<ExternalLinkResponseDto> {
-    return this.get(`/app/aria2/${id}/external-link`);
+    return http.get(`${this.baseUrl}/${id}/external-link`);
   }
 }
 
-// 导出实例
+// 导出单例实例
 export const aria2Api = new Aria2Api();
+
+// 导出用于 Composition API 的 hook
+export function useAria2Api() {
+  return aria2Api;
+}
+
 export default aria2Api;

@@ -154,6 +154,7 @@ export interface FileUploadInfoDto {
   path: string;
   sha1: string;
   fileSize: number;
+  creationTime?: string;
 }
 
 export interface CreateUpdateFileUploadInfoDto {

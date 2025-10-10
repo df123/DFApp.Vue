@@ -1,4 +1,4 @@
-import { ApiService } from "./base";
+import { http } from "@/utils/http";
 import type {
   PagedRequestDto,
   PagedResultDto,
@@ -6,10 +6,8 @@ import type {
   CreateUpdateConfigurationInfoDto
 } from "@/types/api";
 
-class ConfigurationApi extends ApiService {
-  constructor() {
-    super("/api/app/configuration-info");
-  }
+class ConfigurationApi {
+  private baseUrl = "/api/app/configuration-info";
 
   /**
    * 获取配置列表
@@ -17,7 +15,7 @@ class ConfigurationApi extends ApiService {
   async getConfigurations(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<ConfigurationInfoDto>> {
-    return this.get("", params);
+    return http.get(this.baseUrl, { params });
   }
 
   /**
@@ -26,7 +24,7 @@ class ConfigurationApi extends ApiService {
   async createConfiguration(
     request: CreateUpdateConfigurationInfoDto
   ): Promise<ConfigurationInfoDto> {
-    return this.post("", request);
+    return http.post(this.baseUrl, { data: request });
   }
 
   /**
@@ -36,14 +34,14 @@ class ConfigurationApi extends ApiService {
     id: number,
     request: CreateUpdateConfigurationInfoDto
   ): Promise<ConfigurationInfoDto> {
-    return this.put(`/${id}`, request);
+    return http.request("put", `${this.baseUrl}/${id}`, { data: request });
   }
 
   /**
    * 删除配置
    */
   async deleteConfiguration(id: number): Promise<void> {
-    return this.delete(`/${id}`);
+    return http.request("delete", `${this.baseUrl}/${id}`);
   }
 }
 

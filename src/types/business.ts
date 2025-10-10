@@ -387,3 +387,10 @@ export interface GetLogsRequestDto {
   endTime?: string;
   keyword?: string;
 }
+
+// 日志文件信息 DTO
+export interface LogFileInfoDto {
+  name: string;
+  size: number;
+  lastModified: string; // ISO 8601 格式
+}

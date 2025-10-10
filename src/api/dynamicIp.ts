@@ -1,4 +1,4 @@
-import { ApiService } from "./base";
+import { http } from "@/utils/http";
 import type {
   PagedRequestDto,
   PagedResultDto,
@@ -6,10 +6,8 @@ import type {
   CreateUpdateDynamicIPDto
 } from "@/types/api";
 
-class DynamicIpApi extends ApiService {
-  constructor() {
-    super("/api/app/dynamic-ip");
-  }
+class DynamicIpApi {
+  private baseUrl = "/api/app/dynamic-ip";
 
   /**
    * 获取动态IP列表
@@ -17,7 +15,7 @@ class DynamicIpApi extends ApiService {
   async getDynamicIPs(
     params?: PagedRequestDto
   ): Promise<PagedResultDto<DynamicIPDto>> {
-    return this.get("", params);
+    return http.get(this.baseUrl, { params });
   }
 
   /**
@@ -26,7 +24,7 @@ class DynamicIpApi extends ApiService {
   async createDynamicIP(
     request: CreateUpdateDynamicIPDto
   ): Promise<DynamicIPDto> {
-    return this.post("", request);
+    return http.post(this.baseUrl, { data: request });
   }
 
   /**
@@ -36,14 +34,14 @@ class DynamicIpApi extends ApiService {
     id: string,
     request: CreateUpdateDynamicIPDto
   ): Promise<DynamicIPDto> {
-    return this.put(`/${id}`, request);
+    return http.request("put", `${this.baseUrl}/${id}`, { data: request });
   }
 
   /**
    * 删除动态IP
    */
   async deleteDynamicIP(id: string): Promise<void> {
-    return this.delete(`/${id}`);
+    return http.request("delete", `${this.baseUrl}/${id}`);
   }
 }
 

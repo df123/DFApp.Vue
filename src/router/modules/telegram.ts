@@ -3,7 +3,6 @@ import type { RouteRecordRaw } from "vue-router";
 const telegram: RouteRecordRaw = {
   path: "/telegram",
   name: "Telegram",
-  component: () => import("@/views/telegram/index.vue"),
   meta: {
     title: "Telegram管理",
     icon: "ep:message",

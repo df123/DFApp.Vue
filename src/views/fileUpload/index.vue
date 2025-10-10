@@ -16,91 +16,34 @@
       </template>
 
       <!-- 数据表格 -->
-
-      <!-- 数据表格 -->
-      <div class="table-container">
-        <el-table
-          v-loading="loading"
-          :data="tableData"
-          stripe
-          style="width: 100%"
-          @sort-change="handleSortChange"
-        >
-          <el-table-column type="index" label="#" width="60" />
-          <el-table-column
-            prop="fileName"
-            label="文件名"
-            min-width="200"
-            sortable="custom"
-          />
-          <el-table-column
-            prop="fileSize"
-            label="文件大小"
-            width="120"
-            sortable="custom"
+      <pure-table
+        ref="tableRef"
+        :loading="loading"
+        :data="tableData"
+        :columns="columns"
+        :pagination="pagination"
+        @page-size-change="handleSizeChange"
+        @page-current-change="handleCurrentChange"
+      >
+        <template #operation="{ row }">
+          <el-button
+            type="primary"
+            size="small"
+            :icon="Download"
+            @click="handleDownload(row)"
           >
-            <template #default="scope">
-              {{ formatFileSize(scope.row.fileSize) }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="sha1"
-            label="SHA1"
-            min-width="300"
-            show-overflow-tooltip
-          />
-          <el-table-column
-            prop="path"
-            label="路径"
-            min-width="200"
-            show-overflow-tooltip
-          />
-          <el-table-column prop="id" label="ID" width="80" sortable="custom" />
-          <el-table-column
-            prop="creationTime"
-            label="创建时间"
-            width="180"
-            sortable="custom"
+            下载
+          </el-button>
+          <el-button
+            type="danger"
+            size="small"
+            :icon="Delete"
+            @click="handleDelete(row)"
           >
-            <template #default="scope">
-              {{ formatDateTime(scope.row.creationTime) }}
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="150" fixed="right">
-            <template #default="scope">
-              <el-button
-                type="primary"
-                size="small"
-                :icon="Download"
-                @click="handleDownload(scope.row)"
-              >
-                下载
-              </el-button>
-              <el-button
-                type="danger"
-                size="small"
-                :icon="Delete"
-                @click="handleDelete(scope.row)"
-              >
-                删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <!-- 分页 -->
-        <div class="pagination-container">
-          <el-pagination
-            v-model:current-page="pagination.currentPage"
-            v-model:page-size="pagination.pageSize"
-            :page-sizes="[10, 20, 50, 100]"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="pagination.total"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
-        </div>
-      </div>
+            删除
+          </el-button>
+        </template>
+      </pure-table>
     </el-card>
 
     <!-- 上传文件弹窗 -->
@@ -178,13 +121,65 @@ import dayjs from "dayjs";
 // 表格数据
 const loading = ref(false);
 const tableData = ref<FileUploadInfoDto[]>([]);
+const tableRef = ref();
 const pagination = reactive({
-  currentPage: 1,
   pageSize: 10,
+  currentPage: 1,
   total: 0
 });
-const sortField = ref<string>("");
-const sortOrder = ref<string>("");
+
+// 表格列配置
+const columns = ref([
+  {
+    type: "index",
+    label: "#",
+    width: 60
+  },
+  {
+    label: "文件名",
+    prop: "fileName",
+    minWidth: 200
+  },
+  {
+    label: "文件大小",
+    prop: "fileSize",
+    width: 120,
+    formatter: (row: FileUploadInfoDto) => {
+      return formatFileSize(row.fileSize);
+    }
+  },
+  {
+    label: "SHA1",
+    prop: "sha1",
+    minWidth: 300,
+    showOverflowTooltip: true
+  },
+  {
+    label: "路径",
+    prop: "path",
+    minWidth: 200,
+    showOverflowTooltip: true
+  },
+  {
+    label: "ID",
+    prop: "id",
+    width: 80
+  },
+  {
+    label: "创建时间",
+    prop: "creationTime",
+    width: 180,
+    formatter: (row: FileUploadInfoDto) => {
+      return formatDateTime(row.creationTime);
+    }
+  },
+  {
+    label: "操作",
+    slot: "operation",
+    fixed: "right",
+    width: 200
+  }
+]);
 
 // 上传相关
 const fileInputRef = ref<HTMLInputElement>();
@@ -204,8 +199,7 @@ const loadData = async () => {
   try {
     const params: PagedRequestDto = {
       skipCount: (pagination.currentPage - 1) * pagination.pageSize,
-      maxResultCount: pagination.pageSize,
-      sorting: sortField.value ? `${sortField.value} ${sortOrder.value}` : ""
+      maxResultCount: pagination.pageSize
     };
 
     const result = await fileUploadApi.getFileUploadInfos(params);
@@ -232,13 +226,6 @@ const formatFileSize = (size: number): string => {
 const formatDateTime = (dateTime?: string): string => {
   if (!dateTime) return "-";
   return dayjs(dateTime).format("YYYY-MM-DD HH:mm:ss");
-};
-
-// 处理排序变化
-const handleSortChange = ({ prop, order }: { prop: string; order: string }) => {
-  sortField.value = prop;
-  sortOrder.value = order === "ascending" ? "asc" : "desc";
-  loadData();
 };
 
 // 处理分页大小变化

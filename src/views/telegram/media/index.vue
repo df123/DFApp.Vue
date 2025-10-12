@@ -18,11 +18,7 @@
               </template>
             </el-input>
             <el-button type="primary" @click="handleSearch">搜索</el-button>
-            <el-button
-              v-if="hasPermission('DFApp.Medias.Delete')"
-              type="danger"
-              @click="handleDeleteInvalidItems"
-            >
+            <el-button type="danger" @click="handleDeleteInvalidItems">
               删除无效项目
             </el-button>
           </div>

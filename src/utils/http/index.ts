@@ -4,7 +4,11 @@ import Axios, {
   type CustomParamsSerializer
 } from "axios";
 
-import { getCurrentUser, silentRenew } from "@/utils/oidc";
+import {
+  getCurrentUser,
+  silentRenew,
+  setupSilentRenewMessageListener as _setupSilentRenewMessageListener
+} from "@/utils/oidc";
 import type {
   PureHttpError,
   RequestMethods,
@@ -27,6 +31,7 @@ async function initializeCsrfToken(httpInstance: PureHttp) {
     await httpInstance.get("/api/abp/application-configuration");
   } catch (error) {
     console.warn("Failed to initialize CSRF token:", error);
+    // 不再阻止应用初始化，只是记录警告
   }
 }
 
@@ -47,6 +52,8 @@ const defaultConfig: AxiosRequestConfig = {
 
 class PureHttp {
   constructor() {
+    // 初始化时设置消息监听器
+    _setupSilentRenewMessageListener();
     this.httpInterceptorsRequest();
     this.httpInterceptorsResponse();
   }
@@ -107,20 +114,27 @@ class PureHttp {
                 if (!PureHttp.isRefreshing) {
                   PureHttp.isRefreshing = true;
                   try {
+                    console.log("令牌已过期，尝试静默刷新");
                     const renewedUser = await silentRenew();
                     if (renewedUser) {
+                      console.log("静默刷新成功，更新令牌");
                       config.headers["Authorization"] =
                         `Bearer ${renewedUser.access_token}`;
                       PureHttp.requests.forEach(cb =>
                         cb(renewedUser.access_token)
                       );
                       PureHttp.requests = [];
+                    } else {
+                      // 静默刷新返回null，可能需要重新登录
+                      console.warn("静默刷新返回空用户，可能需要重新登录");
+                      // 清除本地存储的用户信息
+                      localStorage.removeItem("oidc_user");
+                      // 不直接重定向，让请求继续并返回401，由具体页面处理
                     }
                   } catch (error) {
                     console.error("Token 刷新失败:", error);
-                    // 刷新失败，清除 token 并重定向登录
+                    // 刷新失败，清除 token 但不直接重定向，让具体页面处理
                     localStorage.removeItem("oidc_user");
-                    window.location.href = "/login";
                   } finally {
                     PureHttp.isRefreshing = false;
                   }

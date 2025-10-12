@@ -11,6 +11,9 @@ export interface OidcConfig {
   automaticSilentRenew: boolean;
   silent_redirect_uri: string;
   client_secret: string;
+  silentRequestTimeout?: number;
+  filterProtocolClaims?: boolean;
+  loadUserInfo?: boolean;
 }
 
 export const oidcConfig: OidcConfig = {
@@ -22,7 +25,12 @@ export const oidcConfig: OidcConfig = {
   scope: "openid profile email roles DFApp",
   automaticSilentRenew: true,
   silent_redirect_uri: `${window.location.origin}/auth/silent-callback`,
-  client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || ""
+  client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || "",
+  // 增加超时设置
+  silentRequestTimeout: 10000, // 静默刷新请求10秒超时
+  // 增加错误处理
+  filterProtocolClaims: true,
+  loadUserInfo: true
 };
 
 export const userManager = new UserManager(oidcConfig);

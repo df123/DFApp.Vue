@@ -14,6 +14,22 @@ import type {
 import { stringify } from "qs";
 import NProgress from "../progress";
 
+// 获取CSRF令牌的函数
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(/XSRF-TOKEN=([\w-]+)/);
+  return match ? match[1] : null;
+}
+
+// 初始化时获取CSRF令牌
+async function initializeCsrfToken(httpInstance: PureHttp) {
+  try {
+    // 尝试从API配置端点获取CSRF令牌
+    await httpInstance.get("/api/abp/application-configuration");
+  } catch (error) {
+    console.warn("Failed to initialize CSRF token:", error);
+  }
+}
+
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
@@ -166,15 +182,13 @@ class PureHttp {
       ...axiosConfig
     } as PureHttpRequestConfig;
 
-    // 确保移除所有可能的cookie相关头部和CSRF令牌
-    if (config.headers) {
-      delete config.headers.cookie;
-      delete config.headers.Cookie;
-      delete config.headers["Set-Cookie"];
-      delete config.headers["X-XSRF-TOKEN"];
-      delete config.headers["X-CSRF-TOKEN"];
-      delete config.headers["x-xsrf-token"];
-      delete config.headers["x-csrf-token"];
+    // 添加CSRF令牌到请求头
+    if (config.method && config.method.toLowerCase() !== "get") {
+      const csrfToken = getCsrfToken();
+      if (csrfToken) {
+        config.headers = config.headers || {};
+        config.headers["RequestVerificationToken"] = csrfToken;
+      }
     }
 
     // 单独处理自定义请求/响应回调
@@ -210,3 +224,6 @@ class PureHttp {
 }
 
 export const http = new PureHttp();
+
+// 初始化CSRF令牌
+initializeCsrfToken(http);

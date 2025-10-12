@@ -35,12 +35,38 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
           target: VITE_API_BASE_URL,
           changeOrigin: true,
           secure: false,
-          rewrite: path => path.replace(/^\/api/, "/api")
+          rewrite: path => path.replace(/^\/api/, "/api"),
+          // 以下选项用于更严格地控制cookie
+          configure: proxy => {
+            proxy.on("proxyReq", proxyReq => {
+              // 移除所有cookie相关的头部和CSRF令牌
+              proxyReq.removeHeader("cookie");
+              proxyReq.removeHeader("Cookie");
+              proxyReq.removeHeader("Set-Cookie");
+              proxyReq.removeHeader("X-XSRF-TOKEN");
+              proxyReq.removeHeader("X-CSRF-TOKEN");
+              proxyReq.removeHeader("x-xsrf-token");
+              proxyReq.removeHeader("x-csrf-token");
+            });
+          }
         },
         "/connect": {
           target: VITE_AUTH_AUTHORITY,
           changeOrigin: true,
-          secure: false
+          secure: false,
+          // 以下选项用于更严格地控制cookie
+          configure: proxy => {
+            proxy.on("proxyReq", proxyReq => {
+              // 移除所有cookie相关的头部和CSRF令牌
+              proxyReq.removeHeader("cookie");
+              proxyReq.removeHeader("Cookie");
+              proxyReq.removeHeader("Set-Cookie");
+              proxyReq.removeHeader("X-XSRF-TOKEN");
+              proxyReq.removeHeader("X-CSRF-TOKEN");
+              proxyReq.removeHeader("x-xsrf-token");
+              proxyReq.removeHeader("x-csrf-token");
+            });
+          }
         }
       },
       // 预热文件以提前转换和缓存结果，降低启动期间的初始页面加载时长并防止转换瀑布

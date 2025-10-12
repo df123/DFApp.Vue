@@ -69,7 +69,7 @@ class BookkeepingExpenditureApi {
   async createExpenditure(
     request: CreateUpdateBookkeepingExpenditureDto
   ): Promise<BookkeepingExpenditureDto> {
-    return http.post(this.baseUrl, { data: request, withCredentials: false });
+    return http.post(this.baseUrl, { data: request });
   }
 
   /**

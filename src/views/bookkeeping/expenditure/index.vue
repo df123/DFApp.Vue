@@ -397,7 +397,7 @@ const handleCreate = () => {
     expenditure: 0,
     remark: "",
     isBelongToSelf: true,
-    categoryId: categories.value[0]?.id || 0
+    categoryId: 1
   });
   dialogVisible.value = true;
 };

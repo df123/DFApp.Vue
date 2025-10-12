@@ -1,4 +1,4 @@
-import type { PagedRequestDto, PagedResultDto } from "./api";
+import type { PagedRequestDto } from "./api";
 
 // Aria2 模块类型
 
@@ -355,10 +355,73 @@ export interface StatisticsWinItemRequestDto extends PagedRequestDto {
   lotteryType?: string;
 }
 
-// 重新导出API类型
-export type { PagedRequestDto, PagedResultDto };
+// ExternalLink 模块类型
 
-// Telegram 模块类型
+// 外部链接 DTO
+export interface ExternalLinkDto {
+  id: number;
+  creationTime: string; // ISO 8601 格式
+  creatorId?: string; // UUID 格式
+  lastModificationTime?: string; // ISO 8601 格式
+  lastModifierId?: string; // UUID 格式
+  name?: string;
+  size?: string;
+  timeConsumed?: string;
+  isRemove: boolean;
+  linkContent?: string;
+}
+
+// 创建/更新外部链接 DTO
+export interface CreateUpdateExternalLinkDto {
+  name?: string;
+  size?: number;
+  timeConsumed?: string;
+  isRemove: boolean;
+  linkContent?: string;
+  mediaIds?: string;
+}
+
+// MediaInfo 模块类型
+
+// 媒体信息 DTO
+export interface MediaInfoDto {
+  id: number;
+  creationTime: string; // ISO 8601 格式
+  creatorId?: string; // UUID 格式
+  lastModificationTime?: string; // ISO 8601 格式
+  lastModifierId?: string; // UUID 格式
+  mediaId?: string;
+  chatId?: number;
+  chatTitle?: string;
+  message?: string;
+  size?: number;
+  savePath?: string;
+  mD5?: string;
+  mimeType?: string;
+  isExternalLinkGenerated: boolean;
+  isDownloadCompleted: boolean;
+}
+
+// 创建/更新媒体信息 DTO
+export interface CreateUpdateMediaInfoDto {
+  mediaId?: number;
+  chatId?: number;
+  chatTitle: string;
+  message?: string;
+  size?: number;
+  savePath: string;
+  mD5: string;
+  mimeType: string;
+  isExternalLinkGenerated?: boolean;
+}
+
+// 图表数据 DTO
+export interface ChartDataDto {
+  labels: string[];
+  datas: number[];
+}
+
+// TGLogin 模块类型
 
 // TG 登录状态响应
 export interface TGLoginStatusDto {

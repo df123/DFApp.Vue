@@ -14,6 +14,7 @@ export interface TellStatusResultDto {
   uploadSpeed: string;
   errorCode: string;
   errorMessage: string;
+  creationTime?: string;
   files: Array<{
     path: string;
     length: string;

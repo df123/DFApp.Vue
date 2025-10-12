@@ -41,6 +41,14 @@ const system: RouteRecordRaw = {
       meta: {
         title: "日志查看器"
       }
+    },
+    {
+      path: "aria2",
+      name: "Aria2",
+      component: () => import("@/views/aria2/index.vue"),
+      meta: {
+        title: "Aria2管理"
+      }
     }
   ]
 };

@@ -43,6 +43,13 @@ class ConfigurationApi {
   async deleteConfiguration(id: number): Promise<void> {
     return http.request("delete", `${this.baseUrl}/${id}`);
   }
+
+  /**
+   * 获取剩余磁盘空间
+   */
+  async getRemainingDiskSpace(): Promise<string> {
+    return http.get(`${this.baseUrl}/remaining-disk-space`);
+  }
 }
 
 // 导出单例实例

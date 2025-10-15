@@ -1,6 +1,6 @@
-import Cookies from "js-cookie";
 import { useUserStoreHook } from "@/store/modules/user";
 import { storageLocal, isString, isIncludeAllChildren } from "@pureadmin/utils";
+import { getCurrentUser } from "./oidc";
 
 export interface DataInfo<T> {
   /** token */
@@ -32,11 +32,25 @@ export const TokenKey = "authorized-token";
 export const multipleTabsKey = "multiple-tabs";
 
 /** 获取`token` */
-export function getToken(): DataInfo<number> {
-  // 此处与`TokenKey`相同，此写法解决初始化时`Cookies`中不存在`TokenKey`报错
-  return Cookies.get(TokenKey)
-    ? JSON.parse(Cookies.get(TokenKey))
-    : storageLocal().getItem(userKey);
+export async function getToken(): Promise<DataInfo<number> | null> {
+  const user = await getCurrentUser();
+  let dataInfo = storageLocal().getItem<DataInfo<number>>(userKey);
+
+  // 如果本地存储中没有用户信息，创建一个默认值
+  if (!dataInfo) {
+    dataInfo = {
+      accessToken: user?.access_token ?? "",
+      expires: 0,
+      refreshToken: "",
+      roles: [],
+      permissions: []
+    };
+  } else {
+    // 更新 access token
+    dataInfo.accessToken = user?.access_token ?? "";
+  }
+
+  return dataInfo;
 }
 
 /**
@@ -47,26 +61,8 @@ export function getToken(): DataInfo<number> {
  */
 export function setToken(data: DataInfo<Date>) {
   let expires = 0;
-  const { accessToken, refreshToken } = data;
-  const { isRemembered, loginDay } = useUserStoreHook();
+  const { refreshToken } = data;
   expires = new Date(data.expires).getTime(); // 如果后端直接设置时间戳，将此处代码改为expires = data.expires，然后把上面的DataInfo<Date>改成DataInfo<number>即可
-  const cookieString = JSON.stringify({ accessToken, expires, refreshToken });
-
-  expires > 0
-    ? Cookies.set(TokenKey, cookieString, {
-        expires: (expires - Date.now()) / 86400000
-      })
-    : Cookies.set(TokenKey, cookieString);
-
-  Cookies.set(
-    multipleTabsKey,
-    "true",
-    isRemembered
-      ? {
-          expires: loginDay
-        }
-      : {}
-  );
 
   function setUserKey({ avatar, username, nickname, roles, permissions }) {
     useUserStoreHook().SET_AVATAR(avatar);
@@ -117,8 +113,6 @@ export function setToken(data: DataInfo<Date>) {
 
 /** 删除`token`以及key值为`user-info`的localStorage信息 */
 export function removeToken() {
-  Cookies.remove(TokenKey);
-  Cookies.remove(multipleTabsKey);
   storageLocal().removeItem(userKey);
 }
 

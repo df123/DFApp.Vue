@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { configurationApi } from "@/api/configuration";
-import { getToken } from "@/utils/auth";
-import { hasPerms } from "@/utils/auth";
+import { getToken, hasPerms } from "@/utils/auth";
 
 defineOptions({
   name: "Welcome"
@@ -14,15 +13,19 @@ const isAuthenticated = ref<boolean>(false);
 const hasPermission = ref<boolean>(false);
 
 // 检查用户是否已认证
-const checkAuthentication = () => {
-  const token = getToken();
+const checkAuthentication = async () => {
+  const token = await getToken();
   isAuthenticated.value = !!(token && token.accessToken);
 };
 
 // 检查用户是否有权限
-const checkPermission = () => {
-  // 使用与后端相同的权限检查
-  hasPermission.value = hasPerms("DFApp.ConfigurationInfo.Default");
+const checkUserPermission = async () => {
+  try {
+    hasPermission.value = hasPerms("DFApp.ConfigurationInfo");
+  } catch (error) {
+    console.error("检查权限失败:", error);
+    hasPermission.value = false;
+  }
 };
 
 // 获取剩余磁盘空间
@@ -39,10 +42,10 @@ const fetchRemainingDiskSpace = async () => {
   }
 };
 
-onMounted(() => {
-  checkAuthentication();
-  checkPermission();
-  fetchRemainingDiskSpace();
+onMounted(async () => {
+  await checkAuthentication();
+  await checkUserPermission();
+  await fetchRemainingDiskSpace();
 });
 </script>
 

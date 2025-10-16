@@ -461,9 +461,9 @@ const formatDateTime = (dateTime: string) => {
 onMounted(async () => {
   // 获取彩票常量
   try {
-    const consts: ConstsDto = await lotteryApi.getLotteryConsts();
-    if (consts && consts.lotteryTypes) {
-      consts.lotteryTypes.forEach((item: any) => {
+    const consts: ConstsDto[] = await lotteryApi.getLotteryConsts();
+    if (consts && Array.isArray(consts) && consts.length > 0) {
+      consts.forEach((item: any) => {
         formLotteryTypeItems.value.push({
           value: item.lotteryTypeEng,
           label: item.lotteryType

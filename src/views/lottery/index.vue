@@ -125,36 +125,18 @@
           </div>
         </el-row>
         <el-row>
-          <div
-            v-if="formLotteryTypeValue == 'ssq'"
-            class="margin-left-12"
-            style="margin-top: 10px"
-          >
+          <div class="margin-left-12" style="margin-top: 10px">
             <el-input
               v-model="formData.indexNo"
-              class="m-1"
+              class="m-1 input-area"
               placeholder="期号"
             />
             <el-input
-              v-model="formData.numbers"
-              class="m-1"
+              v-model="numberInputValue"
+              class="m-1 input-area"
               type="textarea"
               :rows="5"
-              placeholder="红球+蓝球 (例如: 01 02 03 04 05 06+07 或每行一组: 01 02 03 04 05 06+07)"
-            />
-          </div>
-          <div v-if="formLotteryTypeValue != 'ssq'" class="margin-left-12">
-            <el-input
-              v-model="formData.indexNo"
-              class="m-1"
-              placeholder="期号"
-            />
-            <el-input
-              v-model="formData.reds"
-              class="m-1"
-              :rows="5"
-              type="textarea"
-              placeholder="红球"
+              :placeholder="numberInputPlaceholder"
             />
           </div>
         </el-row>
@@ -232,6 +214,26 @@ const formData = reactive({
   reds: "",
   blues: "",
   numbers: ""
+});
+
+// 计算属性：根据彩票类型动态绑定输入框的值
+const numberInputValue = computed({
+  get: () =>
+    formLotteryTypeValue.value === "ssq" ? formData.numbers : formData.reds,
+  set: value => {
+    if (formLotteryTypeValue.value === "ssq") {
+      formData.numbers = value;
+    } else {
+      formData.reds = value;
+    }
+  }
+});
+
+// 计算属性：根据彩票类型动态设置输入框的占位符
+const numberInputPlaceholder = computed(() => {
+  return formLotteryTypeValue.value === "ssq"
+    ? "红球+蓝球 (例如: 01 02 03 04 05 06+07 或每行一组: 01 02 03 04 05 06+07)"
+    : "红球";
 });
 
 // 表单验证规则
@@ -592,6 +594,7 @@ onMounted(async () => {
 
 .botton-area {
   display: flex;
+  width: 100%;
   margin-left: unset;
   font-weight: bold;
 }
@@ -600,7 +603,12 @@ onMounted(async () => {
   width: 100%;
 }
 
+.input-area {
+  width: 100%;
+}
+
 .margin-left-12 {
+  width: 100%;
   margin-right: 1.1rem;
   margin-left: 0.375rem;
 }

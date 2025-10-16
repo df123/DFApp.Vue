@@ -135,8 +135,13 @@
               class="m-1"
               placeholder="期号"
             />
-            <el-input v-model="formData.reds" class="m-1" placeholder="红球" />
-            <el-input v-model="formData.blues" class="m-1" placeholder="蓝球" />
+            <el-input
+              v-model="formData.numbers"
+              class="m-1"
+              type="textarea"
+              :rows="5"
+              placeholder="红球+蓝球 (例如: 01 02 03 04 05 06+07 或每行一组: 01 02 03 04 05 06+07)"
+            />
           </div>
           <div v-if="formLotteryTypeValue != 'ssq'" class="margin-left-12">
             <el-input
@@ -225,7 +230,8 @@ const currentEditId = ref<number | null>(null);
 const formData = reactive({
   indexNo: "",
   reds: "",
-  blues: ""
+  blues: "",
+  numbers: ""
 });
 
 // 表单验证规则
@@ -347,16 +353,6 @@ const confirmDelete = async () => {
 // 表单提交处理
 const handleFormSubmit = async () => {
   try {
-    // 验证输入
-    if (
-      !isValidString(formData.indexNo) ||
-      !isValidString(formData.reds) ||
-      (formLotteryTypeValue.value === "ssq" && !isValidString(formData.blues))
-    ) {
-      ElMessage.error("输入有误");
-      return;
-    }
-
     formLoading.value = true;
 
     // 获取彩票类型信息
@@ -370,29 +366,100 @@ const handleFormSubmit = async () => {
 
     let createDtos: CreateUpdateLotteryDto[] = [];
 
-    // 处理红球数据
-    let redGroups = formData.reds
-      .split(/\n+/)
-      .filter(group => group.trim() !== "");
-    redGroups.forEach((group, groupIndex) => {
-      let groupItems = group.split(/[\s,]+/).filter(item => item.trim() !== "");
-      groupItems.forEach(element => {
-        createDtos.push({
-          indexNo: parseInt(formData.indexNo),
-          number: element,
-          colorType: "0",
-          lotteryType: lotteryType.label,
-          groupId: groupIndex + 1
-        });
-      });
-    });
-
-    // 处理蓝球数据（仅双色球）
+    // 处理双色球数据（红球+蓝球格式）
     if (formLotteryTypeValue.value === "ssq") {
-      let blueGroups = formData.blues
+      // 验证输入
+      if (
+        !isValidString(formData.indexNo) ||
+        !isValidString(formData.numbers)
+      ) {
+        ElMessage.error("请输入期号和号码");
+        return;
+      }
+
+      // 解析红球+蓝球格式
+      let numberGroups = formData.numbers
         .split(/\n+/)
         .filter(group => group.trim() !== "");
-      blueGroups.forEach((group, groupIndex) => {
+
+      numberGroups.forEach((group, groupIndex) => {
+        // 检查是否包含+号（红球+蓝球格式）
+        if (group.includes("+")) {
+          // 处理红球+蓝球格式：01 02 03 04 05 06+07
+          let parts = group.split("+");
+          if (parts.length >= 2) {
+            let redPart = parts[0].trim();
+            let bluePart = parts[1].trim();
+
+            // 处理红球
+            let redNumbers = redPart
+              .split(/[\s,]+/)
+              .filter(item => item.trim() !== "");
+            redNumbers.forEach(element => {
+              createDtos.push({
+                indexNo: parseInt(formData.indexNo),
+                number: element,
+                colorType: "0",
+                lotteryType: lotteryType.label,
+                groupId: groupIndex + 1
+              });
+            });
+
+            // 处理蓝球
+            let blueNumbers = bluePart
+              .split(/[\s,]+/)
+              .filter(item => item.trim() !== "");
+            blueNumbers.forEach(element => {
+              createDtos.push({
+                indexNo: parseInt(formData.indexNo),
+                number: element,
+                colorType: "1",
+                lotteryType: lotteryType.label,
+                groupId: groupIndex + 1
+              });
+            });
+          }
+        } else {
+          // 处理普通格式：将最后一个数字作为蓝球，其余作为红球
+          let numbers = group
+            .split(/[\s,]+/)
+            .filter(item => item.trim() !== "");
+          if (numbers.length > 0) {
+            // 前n-1个作为红球
+            for (let i = 0; i < numbers.length - 1; i++) {
+              createDtos.push({
+                indexNo: parseInt(formData.indexNo),
+                number: numbers[i],
+                colorType: "0",
+                lotteryType: lotteryType.label,
+                groupId: groupIndex + 1
+              });
+            }
+
+            // 最后一个作为蓝球
+            createDtos.push({
+              indexNo: parseInt(formData.indexNo),
+              number: numbers[numbers.length - 1],
+              colorType: "1",
+              lotteryType: lotteryType.label,
+              groupId: groupIndex + 1
+            });
+          }
+        }
+      });
+    } else {
+      // 处理其他彩票类型
+      // 验证输入
+      if (!isValidString(formData.indexNo) || !isValidString(formData.reds)) {
+        ElMessage.error("请输入期号和号码");
+        return;
+      }
+
+      // 处理红球数据
+      let redGroups = formData.reds
+        .split(/\n+/)
+        .filter(group => group.trim() !== "");
+      redGroups.forEach((group, groupIndex) => {
         let groupItems = group
           .split(/[\s,]+/)
           .filter(item => item.trim() !== "");
@@ -400,7 +467,7 @@ const handleFormSubmit = async () => {
           createDtos.push({
             indexNo: parseInt(formData.indexNo),
             number: element,
-            colorType: "1",
+            colorType: "0",
             lotteryType: lotteryType.label,
             groupId: groupIndex + 1
           });
@@ -445,7 +512,8 @@ const resetForm = () => {
   Object.assign(formData, {
     indexNo: "",
     reds: "",
-    blues: ""
+    blues: "",
+    numbers: ""
   });
   formLotteryTypeValue.value = "kl8";
   currentEditId.value = null;

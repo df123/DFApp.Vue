@@ -125,15 +125,19 @@
           </div>
         </el-row>
         <el-row>
-          <div class="margin-left-12" style="margin-top: 10px">
+          <div class="botton-area input-area">
             <el-input
               v-model="formData.indexNo"
-              class="m-1 input-area"
+              class="m-2"
               placeholder="期号"
             />
+          </div>
+        </el-row>
+        <el-row>
+          <div class="botton-area input-area">
             <el-input
               v-model="numberInputValue"
-              class="m-1 input-area"
+              class="m-2"
               type="textarea"
               :rows="5"
               :placeholder="numberInputPlaceholder"

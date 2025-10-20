@@ -305,12 +305,43 @@ const handleSortChange = (sort: any) => {
   }
 };
 
+// 加载最新期号的函数
+const loadLatestIndexNo = async () => {
+  if (formLotteryTypeValue.value) {
+    try {
+      // 获取彩票类型的中文名称
+      const lotteryType = formLotteryTypeItems.value.find(
+        item => item.value === formLotteryTypeValue.value
+      );
+
+      if (lotteryType) {
+        // 调用API获取最新期号
+        const latestIndexNo = await lotteryApi.getLatestIndexNoByType(
+          lotteryType.label
+        );
+
+        // 如果有最新期号，则填充到期号输入框
+        if (latestIndexNo > 0) {
+          formData.indexNo = latestIndexNo.toString();
+        }
+      }
+    } catch (error) {
+      console.error("获取最新期号失败:", error);
+      // 静默失败，不影响用户操作
+    }
+  }
+};
+
 // 操作处理
-const handleCreate = () => {
+const handleCreate = async () => {
   resetForm();
   isEditMode.value = false;
   formDialogTitle.value = "添加彩票记录";
   formDialogVisible.value = true;
+
+  // 等待下一个tick确保弹窗已打开且彩票类型选项已加载
+  await nextTick();
+  loadLatestIndexNo();
 };
 
 const handleEdit = (row: LotteryGroupDto) => {

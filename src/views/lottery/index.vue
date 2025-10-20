@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, nextTick } from "vue";
+import { ref, reactive, onMounted, computed, nextTick, watch } from "vue";
 import {
   ElMessage,
   ElMessageBox,
@@ -530,6 +530,33 @@ const formatDateTime = (dateTime: string) => {
   if (!dateTime) return "";
   return new Date(dateTime).toLocaleString("zh-CN");
 };
+
+// 监听彩票类型变化，自动填充最新期号
+watch(formLotteryTypeValue, async newValue => {
+  if (newValue && formDialogVisible.value) {
+    try {
+      // 获取彩票类型的中文名称
+      const lotteryType = formLotteryTypeItems.value.find(
+        item => item.value === newValue
+      );
+
+      if (lotteryType) {
+        // 调用API获取最新期号
+        const latestIndexNo = await lotteryApi.getLatestIndexNoByType(
+          lotteryType.label
+        );
+
+        // 如果有最新期号，则填充到期号输入框
+        if (latestIndexNo > 0) {
+          formData.indexNo = latestIndexNo.toString();
+        }
+      }
+    } catch (error) {
+      console.error("获取最新期号失败:", error);
+      // 静默失败，不影响用户操作
+    }
+  }
+});
 
 // 生命周期
 onMounted(async () => {

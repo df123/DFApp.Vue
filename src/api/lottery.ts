@@ -66,6 +66,13 @@ export class LotteryApi {
     return http.get(`${this.baseUrl}/lottery-const`);
   }
 
+  // GET /api/app/lottery/latest-index-no
+  async getLatestIndexNoByType(lotteryType: string): Promise<number> {
+    return http.get(`${this.baseUrl}/latest-index-no-by-type`, {
+      params: { lotteryType }
+    });
+  }
+
   // GET /api/app/lottery/statistics-win
   async getStatisticsWin(
     purchasedPeriod?: string,

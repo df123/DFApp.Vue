@@ -113,14 +113,12 @@ onMounted(async () => {
       }
 
       // 设置用户信息和token
-      console.log("设置用户信息成功");
       setToken(userData);
     } catch (error) {
       console.error("设置用户信息失败:", error);
     }
 
     // 重定向到首页
-    console.log("认证成功，重定向到首页");
     router.push("/");
   } else {
     // 认证失败，重定向到登录页

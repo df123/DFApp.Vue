@@ -31,11 +31,12 @@ const extractPermissionNames = (groups: PermissionGroupDto[]): string[] => {
 
 onMounted(async () => {
   const user = await handleAuthCallback();
+
   if (user) {
     // 认证成功，设置用户信息
     try {
       // 从用户信息中提取必要的数据
-      let userData = {
+      const userData = {
         accessToken: user.access_token,
         expires: new Date(user.expires_at! * 1000), // 转换为Date对象
         refreshToken: user.refresh_token || "",
@@ -43,17 +44,13 @@ onMounted(async () => {
         nickname: user.profile?.nickname || user.profile?.name || "",
         avatar: user.profile?.picture || "",
         roles: Array.isArray(user.profile?.role) ? user.profile.role : [],
-        permissions: Array.isArray(user.profile?.permission)
-          ? user.profile.permission
-          : []
+        permissions: []
       };
 
       // 获取用户ID，通常在sub字段中
       const userId = user.profile?.sub;
       // 获取用户角色
-      const userRoles = Array.isArray(user.profile?.role)
-        ? user.profile.role
-        : [];
+      const userRoles = userData.roles as string[];
 
       if (userId) {
         try {
@@ -116,12 +113,14 @@ onMounted(async () => {
       }
 
       // 设置用户信息和token
+      console.log("设置用户信息成功");
       setToken(userData);
     } catch (error) {
       console.error("设置用户信息失败:", error);
     }
 
     // 重定向到首页
+    console.log("认证成功，重定向到首页");
     router.push("/");
   } else {
     // 认证失败，重定向到登录页

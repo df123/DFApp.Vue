@@ -22,7 +22,7 @@ export const oidcConfig: OidcConfig = {
   redirect_uri: `${window.location.origin}/auth/callback`,
   post_logout_redirect_uri: `${window.location.origin}/signout-callback-oidc`,
   response_type: "code",
-  scope: "openid profile email roles DFApp",
+  scope: "openid profile email roles DFApp offline_access",
   automaticSilentRenew: true,
   silent_redirect_uri: `${window.location.origin}/auth/silent-callback`,
   client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || "",

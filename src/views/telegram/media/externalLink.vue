@@ -248,10 +248,17 @@ const handleRemoveFile = async (row: ExternalLinkDto) => {
       }
     );
 
+    loading.value = true;
+
     await externalLinkApi.deleteFile(row.id);
     ElMessage.success("文件移除成功");
-    loadTableData();
+
+    // 等待2秒后刷新表格
+    setTimeout(() => {
+      loadTableData();
+    }, 2000);
   } catch (error) {
+    loading.value = false;
     if (error !== "cancel") {
       console.error("移除文件失败:", error);
       ElMessage.error("移除文件失败");

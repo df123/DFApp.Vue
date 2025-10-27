@@ -24,14 +24,14 @@ function getCsrfToken(): string | null {
   return match ? match[1] : null;
 }
 
-// 初始化时获取CSRF令牌
-async function initializeCsrfToken(httpInstance: PureHttp) {
+// 刷新CSRF令牌的函数，可在登录成功后调用
+export async function refreshCsrfToken(httpInstance: PureHttp = http) {
   try {
     // 尝试从API配置端点获取CSRF令牌
     await httpInstance.get("/api/abp/application-configuration");
+    console.log("CSRF token refreshed successfully");
   } catch (error) {
-    console.warn("Failed to initialize CSRF token:", error);
-    // 不再阻止应用初始化，只是记录警告
+    console.warn("Failed to refresh CSRF token:", error);
   }
 }
 
@@ -238,6 +238,3 @@ class PureHttp {
 }
 
 export const http = new PureHttp();
-
-// 初始化CSRF令牌
-initializeCsrfToken(http);

@@ -10,6 +10,7 @@ import { useRouter } from "vue-router";
 import { handleAuthCallback } from "@/utils/oidc";
 import { setToken } from "@/utils/auth";
 import { permissionApi } from "@/api/permission";
+import { refreshCsrfToken } from "@/utils/http";
 import type { PermissionDto, PermissionGroupDto } from "@/api/permission";
 
 const router = useRouter();
@@ -114,6 +115,13 @@ onMounted(async () => {
 
       // 设置用户信息和token
       setToken(userData);
+
+      // 登录成功后刷新CSRF token
+      try {
+        await refreshCsrfToken();
+      } catch (error) {
+        console.error("刷新CSRF token失败:", error);
+      }
     } catch (error) {
       console.error("设置用户信息失败:", error);
     }

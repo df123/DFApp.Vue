@@ -65,7 +65,7 @@
     "localforage": "^1.10.0",
     "mitt": "^3.0.1",
     "nprogress": "^0.2.0",
-    "oidc-client-ts": "3.0.1",
+    "oidc-client-ts": "3.3.0",
     "path-browserify": "^1.0.1",
     "pinia": "^3.0.3",
     "pinyin-pro": "^3.26.0",

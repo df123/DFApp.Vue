@@ -4,11 +4,7 @@ import Axios, {
   type CustomParamsSerializer
 } from "axios";
 
-import {
-  getCurrentUser,
-  silentRenew,
-  setupSilentRenewMessageListener as _setupSilentRenewMessageListener
-} from "@/utils/oidc";
+import { getCurrentUser } from "@/utils/oidc";
 import type {
   PureHttpError,
   RequestMethods,
@@ -52,33 +48,15 @@ const defaultConfig: AxiosRequestConfig = {
 
 class PureHttp {
   constructor() {
-    // 初始化时设置消息监听器
-    _setupSilentRenewMessageListener();
     this.httpInterceptorsRequest();
     this.httpInterceptorsResponse();
   }
-
-  /** `token`过期后，暂存待执行的请求 */
-  private static requests = [];
-
-  /** 防止重复刷新`token` */
-  private static isRefreshing = false;
 
   /** 初始化配置对象 */
   private static initConfig: PureHttpRequestConfig = {};
 
   /** 保存当前`Axios`实例对象 */
   private static axiosInstance: AxiosInstance = Axios.create(defaultConfig);
-
-  /** 重连原始请求 */
-  private static retryOriginalRequest(config: PureHttpRequestConfig) {
-    return new Promise(resolve => {
-      PureHttp.requests.push((token: string) => {
-        config.headers["Authorization"] = `Bearer ${token}`;
-        resolve(config);
-      });
-    });
-  }
 
   /** 请求拦截 */
   private httpInterceptorsRequest(): void {
@@ -111,35 +89,10 @@ class PureHttp {
                 config.headers["Authorization"] = `Bearer ${user.access_token}`;
                 resolve(config);
               } else if (user && user.expired) {
-                if (!PureHttp.isRefreshing) {
-                  PureHttp.isRefreshing = true;
-                  try {
-                    console.log("令牌已过期，尝试静默刷新");
-                    const renewedUser = await silentRenew();
-                    if (renewedUser) {
-                      console.log("静默刷新成功，更新令牌");
-                      config.headers["Authorization"] =
-                        `Bearer ${renewedUser.access_token}`;
-                      PureHttp.requests.forEach(cb =>
-                        cb(renewedUser.access_token)
-                      );
-                      PureHttp.requests = [];
-                    } else {
-                      // 静默刷新返回null，可能需要重新登录
-                      console.warn("静默刷新返回空用户，可能需要重新登录");
-                      // 清除本地存储的用户信息
-                      localStorage.removeItem("oidc_user");
-                      // 不直接重定向，让请求继续并返回401，由具体页面处理
-                    }
-                  } catch (error) {
-                    console.error("Token 刷新失败:", error);
-                    // 刷新失败，清除 token 但不直接重定向，让具体页面处理
-                    localStorage.removeItem("oidc_user");
-                  } finally {
-                    PureHttp.isRefreshing = false;
-                  }
-                }
-                resolve(PureHttp.retryOriginalRequest(config));
+                // Token已过期，直接清除用户信息并让请求返回401，由具体页面处理重新登录
+                console.warn("令牌已过期，需要重新登录");
+                localStorage.removeItem("oidc_user");
+                resolve(config);
               } else {
                 // 未认证，重定向到登录（但对于 API 请求，可能返回 401）
                 resolve(config);

@@ -60,8 +60,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
       oidc-client-ts:
-        specifier: 3.0.1
-        version: 3.0.1
+        specifier: 3.3.0
+        version: 3.3.0
       path-browserify:
         specifier: ^1.0.1
         version: 1.0.1
@@ -2836,8 +2836,8 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
-  oidc-client-ts@3.0.1:
-    resolution: {integrity: sha512-xX8unZNtmtw3sOz4FPSqDhkLFnxCDsdo2qhFEH2opgWnF/iXMFoYdBQzkwCxAZVgt3FT3DnuBY3k80EZHT0RYg==}
+  oidc-client-ts@3.3.0:
+    resolution: {integrity: sha512-t13S540ZwFOEZKLYHJwSfITugupW4uYLwuQSSXyKH/wHwZ+7FvgHE7gnNJh1YQIZ1Yd1hKSRjqeXGSUtS0r9JA==}
     engines: {node: '>=18'}
 
   onetime@7.0.0:
@@ -6485,7 +6485,7 @@ snapshots:
   ohash@2.0.11:
     optional: true
 
-  oidc-client-ts@3.0.1:
+  oidc-client-ts@3.3.0:
     dependencies:
       jwt-decode: 4.0.0
 

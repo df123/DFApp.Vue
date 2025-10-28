@@ -36,15 +36,5 @@ export default [
       showLink: false,
       rank: 103
     }
-  },
-  {
-    path: "/auth/silent-callback",
-    name: "SilentCallback",
-    component: () => import("@/views/auth/silent-callback.vue"),
-    meta: {
-      title: "静默回调",
-      showLink: false,
-      rank: 104
-    }
   }
 ] satisfies Array<RouteConfigsTable>;

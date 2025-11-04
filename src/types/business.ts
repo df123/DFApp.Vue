@@ -458,3 +458,23 @@ export interface LogFileInfoDto {
   size: number;
   lastModified: string; // ISO 8601 格式
 }
+
+// 复式投注相关类型
+
+// 复式投注输入 DTO
+export interface CompoundLotteryInputDto {
+  Period: number;
+  LotteryType: string;
+  RedNumbers: string[];
+  BlueNumbers: string[];
+  KL8Numbers: string[];
+  PlayType?: LotteryKL8PlayType;
+}
+
+// 复式投注结果 DTO
+export interface CompoundLotteryResultDto {
+  TotalCombinations: number;
+  TotalAmount: number;
+  CreatedLotteries: LotteryDto[];
+  CombinationDetails: string[];
+}

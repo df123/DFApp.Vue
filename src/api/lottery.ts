@@ -15,7 +15,9 @@ import type {
   StatisticsWinItemRequestDto,
   LotteryCombinationDto,
   DeleteByTermNumberDto,
-  WinningStatisticsDto
+  WinningStatisticsDto,
+  CompoundLotteryInputDto,
+  CompoundLotteryResultDto
 } from "../types/business";
 
 // 彩票基础 API
@@ -89,6 +91,43 @@ export class LotteryApi {
     params?: StatisticsWinItemRequestDto
   ): Promise<PagedResultDto<StatisticsWinItemDto>> {
     return http.get(`${this.baseUrl}/statistics-win-item`, { params });
+  }
+
+  // POST /api/app/compound-lottery
+  async calculateCompoundCombination(
+    request: CompoundLotteryInputDto
+  ): Promise<CompoundLotteryResultDto> {
+    return http.post(
+      "/api/app/compound-lottery/calculate-compound-combination",
+      { data: request }
+    );
+  }
+
+  // POST /api/app/compound-lottery/validate
+  async validateCompoundInput(
+    request: CompoundLotteryInputDto
+  ): Promise<string> {
+    return http.post("/api/app/compound-lottery/validate", { data: request });
+  }
+
+  // GET /api/lottery/ssq-combinations
+  async generateSSQCombinations(
+    reds: string[],
+    blues: string[]
+  ): Promise<string[]> {
+    return http.get("/api/lottery/ssq-combinations", {
+      params: { reds, blues }
+    });
+  }
+
+  // GET /api/lottery/kl8-combinations
+  async generateKL8Combinations(
+    numbers: string[],
+    playType: number
+  ): Promise<string[]> {
+    return http.get("/api/lottery/kl8-combinations", {
+      params: { numbers, playType }
+    });
   }
 }
 

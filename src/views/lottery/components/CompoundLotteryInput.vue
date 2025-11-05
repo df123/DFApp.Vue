@@ -10,7 +10,7 @@
           @click="handleCalculate"
         >
           <el-icon><Operation /></el-icon>
-          计算组合
+          计算并保存
         </el-button>
       </div>
     </template>
@@ -129,42 +129,6 @@
       </div>
     </el-form>
 
-    <!-- 计算结果 -->
-    <div v-if="calculationResult" class="calculation-result">
-      <h4>计算结果</h4>
-      <el-row :gutter="20">
-        <el-col :span="8">
-          <div class="result-item">
-            <span class="result-label">总组合数：</span>
-            <span class="result-value">{{
-              calculationResult.TotalCombinations
-            }}</span>
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="result-item">
-            <span class="result-label">总金额：</span>
-            <span class="result-value"
-              >￥{{ calculationResult.TotalAmount }}</span
-            >
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <el-button
-            type="success"
-            :disabled="
-              !calculationResult || calculationResult.TotalCombinations === 0
-            "
-            :loading="creating"
-            @click="handleCreate"
-          >
-            <el-icon><Check /></el-icon>
-            确认创建
-          </el-button>
-        </el-col>
-      </el-row>
-    </div>
-
     <!-- 验证错误信息 -->
     <div v-if="validationErrors.length > 0" class="validation-errors">
       <h5>验证错误：</h5>
@@ -184,7 +148,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from "vue";
 import { ElMessage } from "element-plus";
-import { Operation, Check } from "@element-plus/icons-vue";
+import { Operation } from "@element-plus/icons-vue";
 import { lotteryApi } from "@/api/lottery";
 
 // 快乐8玩法类型
@@ -218,8 +182,6 @@ const kl8NumbersText = ref("");
 
 // 状态
 const calculating = ref(false);
-const creating = ref(false);
-const calculationResult = ref<any>(null);
 const validationErrors = ref<string[]>([]);
 
 // 计算属性
@@ -278,7 +240,6 @@ const onLotteryTypeChange = () => {
   formData.BlueNumbers = [];
   formData.KL8Numbers = [];
   formData.PlayType = undefined;
-  calculationResult.value = null;
   validationErrors.value = [];
 };
 
@@ -355,41 +316,16 @@ const handleCalculate = async () => {
   calculating.value = true;
   try {
     const result = await lotteryApi.calculateCompoundCombination(formData);
-    calculationResult.value = result;
-    ElMessage.success("组合计算完成");
+    ElMessage.success("计算并保存完成");
+    // 清空表单
+    resetForm();
+    // 触发父组件刷新事件
+    emit("created", result);
   } catch (error) {
-    console.error("计算组合失败:", error);
-    ElMessage.error("计算组合失败");
+    console.error("计算并保存失败:", error);
+    ElMessage.error("计算并保存失败");
   } finally {
     calculating.value = false;
-  }
-};
-
-const handleCreate = async () => {
-  if (!calculationResult.value) {
-    return;
-  }
-
-  creating.value = true;
-  try {
-    // 这里可以添加确认对话框
-    // 创建彩票记录（通过计算结果中的CreatedLotteries）
-    if (calculationResult.value.CreatedLotteries?.length > 0) {
-      ElMessage.success(
-        `成功创建 ${calculationResult.value.CreatedLotteries.length} 注彩票`
-      );
-      // 清空表单
-      resetForm();
-      // 触发父组件刷新事件
-      emit("created", calculationResult.value);
-    } else {
-      ElMessage.warning("没有可创建的彩票记录");
-    }
-  } catch (error) {
-    console.error("创建彩票记录失败:", error);
-    ElMessage.error("创建彩票记录失败");
-  } finally {
-    creating.value = false;
   }
 };
 
@@ -403,7 +339,6 @@ const resetForm = () => {
   redNumbersText.value = "";
   blueNumbersText.value = "";
   kl8NumbersText.value = "";
-  calculationResult.value = null;
   validationErrors.value = [];
 };
 
@@ -412,7 +347,6 @@ watch(
   () => formData.PlayType,
   () => {
     validationErrors.value = [];
-    calculationResult.value = null;
   }
 );
 
@@ -425,7 +359,6 @@ watch(
   ],
   () => {
     validationErrors.value = [];
-    calculationResult.value = null;
   }
 );
 
@@ -484,39 +417,6 @@ defineExpose({
 .error-text {
   font-weight: bold;
   color: #f56c6c;
-}
-
-.calculation-result {
-  padding: 20px;
-  margin-top: 20px;
-  background-color: #f0f9ff;
-  border: 1px solid #91d1ff;
-  border-radius: 4px;
-}
-
-.calculation-result h4 {
-  margin: 0 0 20px;
-  font-weight: 600;
-  color: #409eff;
-}
-
-.result-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.result-label {
-  margin-right: 8px;
-  font-weight: 600;
-  color: #606266;
-}
-
-.result-value {
-  font-size: 18px;
-  font-weight: bold;
-  color: #67c23a;
 }
 
 .validation-errors {

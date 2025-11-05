@@ -1,19 +1,17 @@
 <template>
-  <el-card class="compound-lottery-card">
-    <template #header>
-      <div class="card-header">
-        <span class="card-title">复式投注</span>
-        <el-button
-          type="primary"
-          :disabled="!canCalculate"
-          :loading="calculating"
-          @click="handleCalculate"
-        >
-          <el-icon><Operation /></el-icon>
-          计算并保存
-        </el-button>
-      </div>
-    </template>
+  <div class="compound-lottery-container">
+    <div class="card-header">
+      <span class="card-title">复式投注</span>
+      <el-button
+        type="primary"
+        :disabled="!canCalculate"
+        :loading="calculating"
+        @click="handleCalculate"
+      >
+        <el-icon><Operation /></el-icon>
+        计算并保存
+      </el-button>
+    </div>
 
     <el-form :model="formData" label-width="80px" class="compound-form">
       <el-row :gutter="20">
@@ -142,7 +140,7 @@
         </li>
       </ul>
     </div>
-  </el-card>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -374,7 +372,7 @@ defineExpose({
 </script>
 
 <style scoped>
-.compound-lottery-card {
+.compound-lottery-container {
   margin-bottom: 20px;
 }
 

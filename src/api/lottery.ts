@@ -102,33 +102,6 @@ export class LotteryApi {
       { data: request }
     );
   }
-
-  // POST /api/app/compound-lottery/validate
-  async validateCompoundInput(
-    request: CompoundLotteryInputDto
-  ): Promise<string> {
-    return http.post("/api/app/compound-lottery/validate", { data: request });
-  }
-
-  // GET /api/lottery/ssq-combinations
-  async generateSSQCombinations(
-    reds: string[],
-    blues: string[]
-  ): Promise<string[]> {
-    return http.get("/api/lottery/ssq-combinations", {
-      params: { reds, blues }
-    });
-  }
-
-  // GET /api/lottery/kl8-combinations
-  async generateKL8Combinations(
-    numbers: string[],
-    playType: number
-  ): Promise<string[]> {
-    return http.get("/api/lottery/kl8-combinations", {
-      params: { numbers, playType }
-    });
-  }
 }
 
 // 彩票结果 API

@@ -6,198 +6,246 @@
           <span class="card-title">彩票购买</span>
           <div class="header-actions">
             <el-button-group>
-              <el-button
-                :type="activeTab === 'single' ? 'primary' : ''"
-                @click="activeTab = 'single'"
-              >
+              <el-button type="primary" @click="handleSingleBet">
                 单式投注
               </el-button>
               <el-button
                 v-if="hasCreatePermission"
-                :type="activeTab === 'compound' ? 'primary' : ''"
-                @click="activeTab = 'compound'"
+                type="primary"
+                @click="handleCompoundBet"
               >
                 复式投注
               </el-button>
             </el-button-group>
-            <el-button
-              v-if="hasCreatePermission && activeTab === 'single'"
-              type="primary"
-              @click="handleCreate"
-            >
-              <el-icon><Plus /></el-icon>
-              添加
-            </el-button>
           </div>
         </div>
       </template>
 
-      <!-- 单式投注内容 -->
-      <div v-show="activeTab === 'single'">
-        <!-- 数据表格 -->
-        <div class="table-container">
-          <el-table
-            v-loading="loading"
-            :data="tableData"
-            style="width: 100%"
-            stripe
-            @sort-change="handleSortChange"
-          >
-            <el-table-column
-              prop="indexNo"
-              label="期号"
-              sortable="custom"
-              width="120"
-            />
-            <el-table-column
-              prop="lotteryType"
-              label="彩票类型"
-              sortable="custom"
-              width="120"
-            />
-            <el-table-column prop="redNumbers" label="红球号码" min-width="150">
-              <template #default="scope">
-                <span class="red-number">{{ scope.row.redNumbers }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="blueNumber" label="蓝球号码" min-width="100">
-              <template #default="scope">
-                <span class="blue-number">{{ scope.row.blueNumber }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="groupId"
-              label="组号"
-              sortable="custom"
-              min-width="100"
-            />
-            <el-table-column
-              prop="creationTime"
-              label="创建时间"
-              sortable="custom"
-              min-width="180"
-            >
-              <template #default="scope">
-                {{ formatDateTime(scope.row.creationTime) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" fixed="right" width="120">
-              <template #default="scope">
-                <el-button
-                  v-if="hasEditPermission"
-                  size="small"
-                  type="primary"
-                  link
-                  @click="handleEdit(scope.row)"
-                >
-                  编辑
-                </el-button>
-                <el-button
-                  v-if="hasDeletePermission"
-                  size="small"
-                  type="danger"
-                  link
-                  @click="handleDelete(scope.row)"
-                >
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-
-        <div class="pagination-container">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[10, 20, 50, 100]"
-            :total="totalCount"
-            layout="total, sizes, prev, pager, next, jumper"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
-        </div>
-
-        <!-- 创建/编辑对话框 -->
-        <el-dialog
-          v-model="formDialogVisible"
-          :title="formDialogTitle"
-          width="600px"
-          :close-on-click-modal="false"
+      <!-- 数据表格 -->
+      <div class="table-container">
+        <el-table
+          v-loading="loading"
+          :data="tableData"
+          style="width: 100%"
+          stripe
+          @sort-change="handleSortChange"
         >
-          <div class="dialog-content">
-            <el-row>
-              <div class="botton-area select-area">
-                <el-select
-                  v-model="formLotteryTypeValue"
-                  class="m-2"
-                  placeholder="彩票类型"
-                >
-                  <el-option
-                    v-for="item in formLotteryTypeItems"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </div>
-            </el-row>
-            <el-row>
-              <div class="botton-area input-area">
-                <el-input
-                  v-model="formData.indexNo"
-                  class="m-2"
-                  placeholder="期号"
-                />
-              </div>
-            </el-row>
-            <el-row>
-              <div class="botton-area input-area">
-                <el-input
-                  v-model="numberInputValue"
-                  class="m-2"
-                  type="textarea"
-                  :rows="5"
-                  :placeholder="numberInputPlaceholder"
-                />
-              </div>
-            </el-row>
-          </div>
-          <template #footer>
-            <el-button @click="formDialogVisible = false">取消</el-button>
-            <el-button
-              type="primary"
-              :loading="formLoading"
-              @click="handleFormSubmit"
-            >
-              确认
-            </el-button>
-          </template>
-        </el-dialog>
-
-        <!-- 删除确认对话框 -->
-        <el-dialog v-model="deleteDialogVisible" title="确认删除" width="400px">
-          <span>确定要删除这条记录吗？</span>
-          <template #footer>
-            <el-button @click="deleteDialogVisible = false">取消</el-button>
-            <el-button
-              type="danger"
-              :loading="deleteLoading"
-              @click="confirmDelete"
-            >
-              确认删除
-            </el-button>
-          </template>
-        </el-dialog>
+          <el-table-column
+            prop="indexNo"
+            label="期号"
+            sortable="custom"
+            width="120"
+          />
+          <el-table-column
+            prop="lotteryType"
+            label="彩票类型"
+            sortable="custom"
+            width="120"
+          />
+          <el-table-column prop="redNumbers" label="红球号码" min-width="150">
+            <template #default="scope">
+              <span class="red-number">{{ scope.row.redNumbers }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="blueNumber" label="蓝球号码" min-width="100">
+            <template #default="scope">
+              <span class="blue-number">{{ scope.row.blueNumber }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="groupId"
+            label="组号"
+            sortable="custom"
+            min-width="100"
+          />
+          <el-table-column
+            prop="creationTime"
+            label="创建时间"
+            sortable="custom"
+            min-width="180"
+          >
+            <template #default="scope">
+              {{ formatDateTime(scope.row.creationTime) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" fixed="right" width="120">
+            <template #default="scope">
+              <el-button
+                v-if="hasEditPermission"
+                size="small"
+                type="primary"
+                link
+                @click="handleEdit(scope.row)"
+              >
+                编辑
+              </el-button>
+              <el-button
+                v-if="hasDeletePermission"
+                size="small"
+                type="danger"
+                link
+                @click="handleDelete(scope.row)"
+              >
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
 
-      <!-- 复式投注内容 -->
-      <div v-show="activeTab === 'compound'">
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="totalCount"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
+
+      <!-- 单式投注弹窗 -->
+      <el-dialog
+        v-model="singleDialogVisible"
+        title="单式投注"
+        width="600px"
+        :close-on-click-modal="false"
+      >
+        <div class="dialog-content">
+          <el-row>
+            <div class="botton-area select-area">
+              <el-select
+                v-model="formLotteryTypeValue"
+                class="m-2"
+                placeholder="彩票类型"
+              >
+                <el-option
+                  v-for="item in formLotteryTypeItems"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+          </el-row>
+          <el-row>
+            <div class="botton-area input-area">
+              <el-input
+                v-model="formData.indexNo"
+                class="m-2"
+                placeholder="期号"
+              />
+            </div>
+          </el-row>
+          <el-row>
+            <div class="botton-area input-area">
+              <el-input
+                v-model="numberInputValue"
+                class="m-2"
+                type="textarea"
+                :rows="5"
+                :placeholder="numberInputPlaceholder"
+              />
+            </div>
+          </el-row>
+        </div>
+        <template #footer>
+          <el-button @click="singleDialogVisible = false">取消</el-button>
+          <el-button
+            type="primary"
+            :loading="formLoading"
+            @click="handleFormSubmit"
+          >
+            确认
+          </el-button>
+        </template>
+      </el-dialog>
+
+      <!-- 复式投注弹窗 -->
+      <el-dialog
+        v-model="compoundDialogVisible"
+        title="复式投注"
+        width="800px"
+        :close-on-click-modal="false"
+      >
         <CompoundLotteryInput
           ref="compoundInputRef"
           @created="handleCompoundCreated"
         />
-      </div>
+      </el-dialog>
+
+      <!-- 编辑对话框 -->
+      <el-dialog
+        v-model="formDialogVisible"
+        :title="formDialogTitle"
+        width="600px"
+        :close-on-click-modal="false"
+      >
+        <div class="dialog-content">
+          <el-row>
+            <div class="botton-area select-area">
+              <el-select
+                v-model="formLotteryTypeValue"
+                class="m-2"
+                placeholder="彩票类型"
+              >
+                <el-option
+                  v-for="item in formLotteryTypeItems"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+          </el-row>
+          <el-row>
+            <div class="botton-area input-area">
+              <el-input
+                v-model="formData.indexNo"
+                class="m-2"
+                placeholder="期号"
+              />
+            </div>
+          </el-row>
+          <el-row>
+            <div class="botton-area input-area">
+              <el-input
+                v-model="numberInputValue"
+                class="m-2"
+                type="textarea"
+                :rows="5"
+                :placeholder="numberInputPlaceholder"
+              />
+            </div>
+          </el-row>
+        </div>
+        <template #footer>
+          <el-button @click="formDialogVisible = false">取消</el-button>
+          <el-button
+            type="primary"
+            :loading="formLoading"
+            @click="handleFormSubmit"
+          >
+            确认
+          </el-button>
+        </template>
+      </el-dialog>
+
+      <!-- 删除确认对话框 -->
+      <el-dialog v-model="deleteDialogVisible" title="确认删除" width="400px">
+        <span>确定要删除这条记录吗？</span>
+        <template #footer>
+          <el-button @click="deleteDialogVisible = false">取消</el-button>
+          <el-button
+            type="danger"
+            :loading="deleteLoading"
+            @click="confirmDelete"
+          >
+            确认删除
+          </el-button>
+        </template>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -210,7 +258,6 @@ import {
   type FormInstance,
   type FormRules
 } from "element-plus";
-import { Plus } from "@element-plus/icons-vue";
 import { lotteryApi } from "@/api/lottery";
 import CompoundLotteryInput from "./components/CompoundLotteryInput.vue";
 import type { PagedRequestDto, PagedResultDto } from "@/types/api";
@@ -232,8 +279,11 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const sortField = ref("indexNo");
 const sortOrder = ref("desc");
-const activeTab = ref("single");
 const compoundInputRef = ref();
+
+// 弹窗状态
+const singleDialogVisible = ref(false);
+const compoundDialogVisible = ref(false);
 
 // 表单相关状态
 const formRef = ref<FormInstance>();
@@ -364,15 +414,21 @@ const loadLatestIndexNo = async () => {
 };
 
 // 操作处理
-const handleCreate = async () => {
+const handleSingleBet = async () => {
   resetForm();
-  isEditMode.value = false;
-  formDialogTitle.value = "添加彩票记录";
-  formDialogVisible.value = true;
+  singleDialogVisible.value = true;
 
   // 等待下一个tick确保弹窗已打开且彩票类型选项已加载
   await nextTick();
   loadLatestIndexNo();
+};
+
+const handleCompoundBet = async () => {
+  compoundDialogVisible.value = true;
+  // 重置复式投注表单
+  nextTick(() => {
+    compoundInputRef.value?.resetForm();
+  });
 };
 
 const handleEdit = (row: LotteryGroupDto) => {
@@ -555,6 +611,7 @@ const handleFormSubmit = async () => {
     }
 
     ElMessage.success(isEditMode.value ? "更新成功" : "创建成功");
+    singleDialogVisible.value = false;
     formDialogVisible.value = false;
     fetchTableData();
   } catch (error) {
@@ -596,12 +653,13 @@ const formatDateTime = (dateTime: string) => {
 // 复式投注创建成功处理
 const handleCompoundCreated = (result: any) => {
   ElMessage.success(`复式投注创建成功，共 ${result.TotalCombinations} 种组合`);
+  compoundDialogVisible.value = false;
   fetchTableData();
 };
 
 // 监听彩票类型变化，自动填充最新期号
 watch(formLotteryTypeValue, async newValue => {
-  if (newValue && formDialogVisible.value) {
+  if (newValue && (singleDialogVisible.value || formDialogVisible.value)) {
     try {
       // 获取彩票类型的中文名称
       const lotteryType = formLotteryTypeItems.value.find(

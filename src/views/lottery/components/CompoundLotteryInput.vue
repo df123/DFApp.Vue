@@ -1,7 +1,6 @@
 <template>
   <div class="compound-lottery-container">
     <div class="card-header">
-      <span class="card-title">复式投注</span>
       <el-button
         type="primary"
         :disabled="!canCalculate"
@@ -16,15 +15,6 @@
     <el-form :model="formData" label-width="80px" class="compound-form">
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="期号" required>
-            <el-input
-              v-model="formData.Period"
-              placeholder="请输入期号"
-              type="number"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
           <el-form-item label="彩票类型" required>
             <el-select
               v-model="formData.LotteryType"
@@ -34,6 +24,15 @@
               <el-option label="双色球" value="ssq" />
               <el-option label="快乐8" value="kl8" />
             </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="期号" required>
+            <el-input
+              v-model="formData.Period"
+              placeholder="请输入期号"
+              type="number"
+            />
           </el-form-item>
         </el-col>
       </el-row>
@@ -144,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from "vue";
+import { ref, reactive, computed, watch, nextTick } from "vue";
 import { ElMessage } from "element-plus";
 import { Operation } from "@element-plus/icons-vue";
 import { lotteryApi } from "@/api/lottery";
@@ -239,6 +238,41 @@ const onLotteryTypeChange = () => {
   formData.KL8Numbers = [];
   formData.PlayType = undefined;
   validationErrors.value = [];
+
+  // 获取最新期号并加一
+  loadLatestIndexNo();
+};
+
+// 加载最新期号并加一
+const loadLatestIndexNo = async () => {
+  if (formData.LotteryType) {
+    try {
+      // 获取彩票类型的中文名称
+      const lotteryTypeMap: { [key: string]: string } = {
+        ssq: "双色球",
+        kl8: "快乐8"
+      };
+
+      const lotteryTypeName = lotteryTypeMap[formData.LotteryType];
+      if (lotteryTypeName) {
+        // 调用API获取最新期号
+        const latestIndexNo =
+          await lotteryApi.getLatestIndexNoByType(lotteryTypeName);
+
+        // 如果有最新期号，则加一后填充到期号输入框
+        if (latestIndexNo > 0) {
+          formData.Period = latestIndexNo + 1;
+        } else {
+          // 如果没有最新期号，设置为1
+          formData.Period = 1;
+        }
+      }
+    } catch (error) {
+      console.error("获取最新期号失败:", error);
+      // 静默失败，不影响用户操作，设置默认期号
+      formData.Period = 1;
+    }
+  }
 };
 
 const validateInput = (): string[] => {
@@ -378,8 +412,10 @@ defineExpose({
 
 .card-header {
   display: flex;
+  flex-direction: row-reverse;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 .card-title {

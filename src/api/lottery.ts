@@ -63,6 +63,22 @@ export class LotteryApi {
     return http.post("/api/app/lottery-grouped", { data: request });
   }
 
+  // DELETE /api/app/lottery-grouped/{groupId}
+  async deleteLotteryGroup(groupId: number): Promise<void> {
+    return http.request("delete", `${this.baseUrl}/grouped/${groupId}`);
+  }
+
+  // DELETE /api/app/lottery-grouped/by-index-no-and-group-id
+  async deleteLotteryGroupByIndexNoAndGroupId(
+    indexNo: number,
+    groupId: number
+  ): Promise<void> {
+    return http.request(
+      "delete",
+      `${this.baseUrl}/lottery-group-by-index-no-and-group-id/${groupId}?indexNo=${indexNo}`
+    );
+  }
+
   // GET /api/app/lottery/const
   async getLotteryConsts(): Promise<ConstsDto[]> {
     return http.get(`${this.baseUrl}/lottery-const`);

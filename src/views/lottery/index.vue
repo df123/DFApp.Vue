@@ -84,9 +84,9 @@
                 size="small"
                 type="danger"
                 link
-                @click="handleDelete(scope.row)"
+                @click="handleDelete(scope.row.indexNo, scope.row.groupId)"
               >
-                删除
+                删除组
               </el-button>
             </template>
           </el-table-column>
@@ -234,7 +234,7 @@
 
       <!-- 删除确认对话框 -->
       <el-dialog v-model="deleteDialogVisible" title="确认删除" width="400px">
-        <span>确定要删除这条记录吗？</span>
+        <span>确定要删除整组记录吗？此操作不可恢复。</span>
         <template #footer>
           <el-button @click="deleteDialogVisible = false">取消</el-button>
           <el-button
@@ -242,7 +242,7 @@
             :loading="deleteLoading"
             @click="confirmDelete"
           >
-            确认删除
+            确认删除组
           </el-button>
         </template>
       </el-dialog>
@@ -336,7 +336,8 @@ const formRules: FormRules = {
 // 删除相关状态
 const deleteDialogVisible = ref(false);
 const deleteLoading = ref(false);
-const currentDeleteId = ref<number | null>(null);
+const currentDeleteIndexNo = ref<number | null>(null);
+const currentDeleteGroupId = ref<number | null>(null);
 
 // 权限控制（这里需要根据项目实际的权限系统进行调整）
 const hasCreatePermission = computed(() => true); // 替换为实际的权限检查
@@ -451,17 +452,29 @@ const handleEdit = (row: LotteryGroupDto) => {
   formDialogVisible.value = true;
 };
 
-const handleDelete = (row: LotteryGroupDto) => {
-  currentDeleteId.value = row.id!;
+const handleDelete = (indexNo: number, groupId: number) => {
+  currentDeleteIndexNo.value = indexNo;
+  currentDeleteGroupId.value = groupId;
   deleteDialogVisible.value = true;
 };
 
 const confirmDelete = async () => {
-  if (!currentDeleteId.value) return;
+  if (
+    currentDeleteIndexNo.value === null ||
+    currentDeleteIndexNo.value === undefined ||
+    currentDeleteGroupId.value === null ||
+    currentDeleteGroupId.value === undefined
+  ) {
+    console.error("IndexNo or Group ID is null or undefined");
+    return;
+  }
 
   deleteLoading.value = true;
   try {
-    await lotteryApi.deleteLottery(currentDeleteId.value);
+    await lotteryApi.deleteLotteryGroupByIndexNoAndGroupId(
+      currentDeleteIndexNo.value,
+      currentDeleteGroupId.value
+    );
     ElMessage.success("删除成功");
     deleteDialogVisible.value = false;
     fetchTableData();
@@ -470,7 +483,8 @@ const confirmDelete = async () => {
     ElMessage.error("删除失败");
   } finally {
     deleteLoading.value = false;
-    currentDeleteId.value = null;
+    currentDeleteIndexNo.value = null;
+    currentDeleteGroupId.value = null;
   }
 };
 

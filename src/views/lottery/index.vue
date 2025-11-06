@@ -652,7 +652,9 @@ const formatDateTime = (dateTime: string) => {
 
 // 复式投注创建成功处理
 const handleCompoundCreated = (result: any) => {
-  ElMessage.success(`复式投注创建成功，共 ${result.TotalCombinations} 种组合`);
+  const totalCombinations =
+    result?.TotalCombinations || result?.totalCombinations || 0;
+  ElMessage.success(`复式投注创建成功，共 ${totalCombinations} 种组合`);
   compoundDialogVisible.value = false;
   fetchTableData();
 };

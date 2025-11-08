@@ -56,6 +56,14 @@ const lottery: RouteRecordRaw = {
       meta: {
         title: "快乐8模拟"
       }
+    },
+    {
+      path: "data-fetch",
+      name: "LotteryDataFetch",
+      component: () => import("@/views/lottery/data-fetch.vue"),
+      meta: {
+        title: "数据获取测试"
+      }
     }
   ]
 };

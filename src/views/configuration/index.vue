@@ -197,7 +197,7 @@ const dialogTitle = computed(() =>
 
 // 表单验证规则
 const formRules: FormRules = {
-  moduleName: [{ required: true, message: "请输入模块名称", trigger: "blur" }],
+  moduleName: [{ required: false, message: "请输入模块名称", trigger: "blur" }],
   configurationName: [
     { required: true, message: "请输入配置名称", trigger: "blur" }
   ],

@@ -6,7 +6,7 @@ const telegram: RouteRecordRaw = {
   meta: {
     title: "Telegram管理",
     icon: "ep:message",
-    alwaysShow: true
+    rank: 3
   },
   children: [
     {

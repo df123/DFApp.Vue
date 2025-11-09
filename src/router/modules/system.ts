@@ -7,7 +7,7 @@ const system: RouteRecordRaw = {
   meta: {
     title: "系统管理",
     icon: "ep:setting",
-    alwaysShow: true
+    rank: 4
   },
   children: [
     {

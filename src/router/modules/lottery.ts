@@ -6,7 +6,7 @@ const lottery: RouteRecordRaw = {
   meta: {
     title: "彩票管理",
     icon: "ep:pie-chart",
-    alwaysShow: true
+    rank: 2
   },
   children: [
     {

@@ -6,7 +6,7 @@ const bookkeeping: RouteRecordRaw = {
   meta: {
     title: "记账管理",
     icon: "ep:notebook",
-    alwaysShow: true
+    rank: 1
   },
   children: [
     {

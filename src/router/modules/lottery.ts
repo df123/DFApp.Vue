@@ -1,8 +1,7 @@
-import type { RouteRecordRaw } from "vue-router";
-
-const lottery: RouteRecordRaw = {
+export default {
   path: "/lottery",
   name: "Lottery",
+  redirect: "/lottery/buy",
   meta: {
     title: "彩票管理",
     icon: "ep:pie-chart",
@@ -10,7 +9,7 @@ const lottery: RouteRecordRaw = {
   },
   children: [
     {
-      path: "buy",
+      path: "/lottery/buy",
       name: "LotteryBuy",
       component: () => import("@/views/lottery/index.vue"),
       meta: {
@@ -18,7 +17,7 @@ const lottery: RouteRecordRaw = {
       }
     },
     {
-      path: "result",
+      path: "/lottery/result",
       name: "LotteryResult",
       component: () => import("@/views/lottery/result/index.vue"),
       meta: {
@@ -26,7 +25,7 @@ const lottery: RouteRecordRaw = {
       }
     },
     {
-      path: "statistics",
+      path: "/lottery/statistics",
       name: "LotteryStatistics",
       component: () => import("@/views/lottery/statistics/index.vue"),
       meta: {
@@ -34,7 +33,7 @@ const lottery: RouteRecordRaw = {
       }
     },
     {
-      path: "statistics-item",
+      path: "/lottery/statistics-item",
       name: "LotteryStatisticsItem",
       component: () => import("@/views/lottery/statistics-item/index.vue"),
       meta: {
@@ -42,7 +41,7 @@ const lottery: RouteRecordRaw = {
       }
     },
     {
-      path: "simulation/ssq",
+      path: "/lottery/simulation/ssq",
       name: "LotterySimulation",
       component: () => import("@/views/lottery/simulation/ssq/index.vue"),
       meta: {
@@ -50,7 +49,7 @@ const lottery: RouteRecordRaw = {
       }
     },
     {
-      path: "simulation/kl8",
+      path: "/lottery/simulation/kl8",
       name: "LotteryK8",
       component: () => import("@/views/lottery/simulation/kl8/index.vue"),
       meta: {
@@ -58,7 +57,7 @@ const lottery: RouteRecordRaw = {
       }
     },
     {
-      path: "data-fetch",
+      path: "/lottery/data-fetch",
       name: "LotteryDataFetch",
       component: () => import("@/views/lottery/data-fetch.vue"),
       meta: {
@@ -66,6 +65,4 @@ const lottery: RouteRecordRaw = {
       }
     }
   ]
-};
-
-export default lottery;
+} satisfies RouteConfigsTable;

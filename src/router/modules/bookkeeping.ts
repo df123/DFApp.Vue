@@ -1,8 +1,7 @@
-import type { RouteRecordRaw } from "vue-router";
-
-const bookkeeping: RouteRecordRaw = {
+export default {
   path: "/bookkeeping",
   name: "Bookkeeping",
+  redirect: "/bookkeeping/expenditure",
   meta: {
     title: "记账管理",
     icon: "ep:notebook",
@@ -10,7 +9,7 @@ const bookkeeping: RouteRecordRaw = {
   },
   children: [
     {
-      path: "expenditure",
+      path: "/bookkeeping/expenditure",
       name: "Expenditure",
       component: () => import("@/views/bookkeeping/expenditure/index.vue"),
       meta: {
@@ -18,7 +17,7 @@ const bookkeeping: RouteRecordRaw = {
       }
     },
     {
-      path: "expenditure/analysis",
+      path: "/bookkeeping/expenditure/analysis",
       name: "ExpenditureAnalysis",
       component: () => import("@/views/bookkeeping/expenditure/analysis.vue"),
       meta: {
@@ -26,7 +25,7 @@ const bookkeeping: RouteRecordRaw = {
       }
     },
     {
-      path: "expenditure/chart",
+      path: "/bookkeeping/expenditure/chart",
       name: "ExpenditureChart",
       component: () => import("@/views/bookkeeping/expenditure/chart.vue"),
       meta: {
@@ -34,7 +33,7 @@ const bookkeeping: RouteRecordRaw = {
       }
     },
     {
-      path: "category",
+      path: "/bookkeeping/category",
       name: "Category",
       component: () => import("@/views/bookkeeping/category/index.vue"),
       meta: {
@@ -42,6 +41,4 @@ const bookkeeping: RouteRecordRaw = {
       }
     }
   ]
-};
-
-export default bookkeeping;
+} satisfies RouteConfigsTable;

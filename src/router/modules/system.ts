@@ -1,8 +1,7 @@
-import type { RouteRecordRaw } from "vue-router";
-
-const system: RouteRecordRaw = {
+export default {
   path: "/system",
   name: "System",
+  redirect: "/system/configuration",
   component: () => import("@/views/system/index.vue"),
   meta: {
     title: "系统管理",
@@ -11,7 +10,7 @@ const system: RouteRecordRaw = {
   },
   children: [
     {
-      path: "configuration",
+      path: "/system/configuration",
       name: "Configuration",
       component: () => import("@/views/configuration/index.vue"),
       meta: {
@@ -19,7 +18,7 @@ const system: RouteRecordRaw = {
       }
     },
     {
-      path: "dynamicIp",
+      path: "/system/dynamicIp",
       name: "DynamicIp",
       component: () => import("@/views/dynamicIp/index.vue"),
       meta: {
@@ -27,7 +26,7 @@ const system: RouteRecordRaw = {
       }
     },
     {
-      path: "fileUpload",
+      path: "/system/fileUpload",
       name: "FileUpload",
       component: () => import("@/views/fileUpload/index.vue"),
       meta: {
@@ -35,7 +34,7 @@ const system: RouteRecordRaw = {
       }
     },
     {
-      path: "logViewer",
+      path: "/system/logViewer",
       name: "LogViewer",
       component: () => import("@/views/logViewer/index.vue"),
       meta: {
@@ -43,7 +42,7 @@ const system: RouteRecordRaw = {
       }
     },
     {
-      path: "aria2",
+      path: "/system/aria2",
       name: "Aria2",
       component: () => import("@/views/aria2/index.vue"),
       meta: {
@@ -51,6 +50,4 @@ const system: RouteRecordRaw = {
       }
     }
   ]
-};
-
-export default system;
+} satisfies RouteConfigsTable;

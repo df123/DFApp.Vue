@@ -1,8 +1,7 @@
-import type { RouteRecordRaw } from "vue-router";
-
-const telegram: RouteRecordRaw = {
+export default {
   path: "/telegram",
   name: "Telegram",
+  redirect: "/telegram/tg/login",
   meta: {
     title: "Telegram管理",
     icon: "ep:message",
@@ -10,7 +9,7 @@ const telegram: RouteRecordRaw = {
   },
   children: [
     {
-      path: "tg/login",
+      path: "/telegram/tg/login",
       name: "TGLogin",
       component: () => import("@/views/telegram/login/index.vue"),
       meta: {
@@ -18,7 +17,7 @@ const telegram: RouteRecordRaw = {
       }
     },
     {
-      path: "media",
+      path: "/telegram/media",
       name: "Media",
       component: () => import("@/views/telegram/media/index.vue"),
       meta: {
@@ -26,7 +25,7 @@ const telegram: RouteRecordRaw = {
       }
     },
     {
-      path: "media/chart",
+      path: "/telegram/media/chart",
       name: "MediaChart",
       component: () => import("@/views/telegram/media/chart.vue"),
       meta: {
@@ -34,7 +33,7 @@ const telegram: RouteRecordRaw = {
       }
     },
     {
-      path: "media/externalLink",
+      path: "/telegram/media/externalLink",
       name: "ExternalLink",
       component: () => import("@/views/telegram/media/externalLink.vue"),
       meta: {
@@ -42,6 +41,4 @@ const telegram: RouteRecordRaw = {
       }
     }
   ]
-};
-
-export default telegram;
+} satisfies RouteConfigsTable;

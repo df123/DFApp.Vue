@@ -88,8 +88,21 @@ const initChart = () => {
           }
         },
         tooltip: {
-          mode: "index",
-          intersect: false
+          mode: "point",
+          intersect: true,
+          callbacks: {
+            title: function (context) {
+              return "月份: " + context[0].label;
+            },
+            label: function (context) {
+              return (
+                context.dataset.label +
+                ": " +
+                context.parsed.y.toFixed(2) +
+                " 元"
+              );
+            }
+          }
         }
       }
     }
@@ -146,8 +159,7 @@ const updateChart = (data: MonthlyExpenditureDto) => {
         borderColor: "rgba(54, 162, 235, 1)",
         borderWidth: 2,
         borderDash: [5, 5],
-        fill: false,
-        pointRadius: 0
+        fill: false
       },
       {
         label: "个人支出平均值",
@@ -156,8 +168,7 @@ const updateChart = (data: MonthlyExpenditureDto) => {
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 2,
         borderDash: [5, 5],
-        fill: false,
-        pointRadius: 0
+        fill: false
       },
       {
         label: "非个人支出平均值",
@@ -166,8 +177,7 @@ const updateChart = (data: MonthlyExpenditureDto) => {
         borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 2,
         borderDash: [5, 5],
-        fill: false,
-        pointRadius: 0
+        fill: false
       }
     ]
   };

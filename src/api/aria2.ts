@@ -32,29 +32,14 @@ class Aria2Api {
    * 删除单个记录
    */
   async delete(id: number): Promise<void> {
-    return this.request("delete", `${this.baseUrl}/${id}`);
+    return http.request("delete", `${this.baseUrl}/${id}`);
   }
 
   /**
    * 删除所有记录
    */
   async deleteAll(): Promise<void> {
-    return this.request("delete", `${this.baseUrl}/all`);
-  }
-
-  /**
-   * 通用请求方法
-   */
-  private request<T>(
-    method: "get" | "post" | "put" | "delete",
-    url: string,
-    data?: any
-  ): Promise<T> {
-    if (method === "get") {
-      return http.get<T, any>(url, { params: data });
-    } else {
-      return http.post<T, any>(url, { data });
-    }
+    return http.request("delete", `${this.baseUrl}/all`);
   }
 }
 

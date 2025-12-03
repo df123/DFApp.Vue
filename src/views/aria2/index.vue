@@ -21,6 +21,14 @@
               <el-icon><Delete /></el-icon>
               删除全部
             </el-button>
+            <el-button
+              v-permission="['DFApp.Aria2.Delete']"
+              type="warning"
+              @click="handleClearDownloadDirectory"
+            >
+              <el-icon><Delete /></el-icon>
+              清空下载目录
+            </el-button>
           </div>
         </div>
       </template>
@@ -270,6 +278,29 @@ const handleDeleteAll = async () => {
     if (error !== "cancel") {
       console.error("删除全部失败:", error);
       ElMessage.error("删除全部失败");
+    }
+  }
+};
+
+const handleClearDownloadDirectory = async () => {
+  try {
+    await ElMessageBox.confirm(
+      "确定要清空下载目录吗？此操作将删除目录下的所有文件和子文件夹，且不可恢复。",
+      "清空下载目录确认",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }
+    );
+
+    await aria2Api.clearDownloadDirectory();
+    ElMessage.success("清空下载目录成功！");
+    loadTableData();
+  } catch (error) {
+    if (error !== "cancel") {
+      console.error("清空下载目录失败:", error);
+      ElMessage.error("清空下载目录失败");
     }
   }
 };

@@ -41,6 +41,13 @@ class Aria2Api {
   async deleteAll(): Promise<void> {
     return http.request("delete", `${this.baseUrl}/all`);
   }
+
+  /**
+   * 清空下载目录
+   */
+  async clearDownloadDirectory(): Promise<void> {
+    return http.post(`${this.baseUrl}/clear-download-directory`);
+  }
 }
 
 // 导出单例实例

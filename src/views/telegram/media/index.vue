@@ -104,6 +104,24 @@ const columns = ref([
     }
   },
   {
+    label: "下载时间",
+    prop: "downloadTimeMs",
+    width: 120,
+    formatter: (row: MediaInfoDto) => {
+      if (!row.downloadTimeMs) return "-";
+      return `${(row.downloadTimeMs / 1000).toFixed(2)} s`;
+    }
+  },
+  {
+    label: "下载速度",
+    prop: "downloadSpeedBps",
+    width: 120,
+    formatter: (row: MediaInfoDto) => {
+      if (!row.downloadSpeedBps) return "-";
+      return formatFileSize(row.downloadSpeedBps) + "/s";
+    }
+  },
+  {
     label: "媒体类型",
     prop: "mimeType",
     width: 120

@@ -401,6 +401,8 @@ export interface MediaInfoDto {
   mimeType?: string;
   isExternalLinkGenerated: boolean;
   isDownloadCompleted: boolean;
+  downloadTimeMs?: number;
+  downloadSpeedBps?: number;
 }
 
 // 创建/更新媒体信息 DTO

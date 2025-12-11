@@ -48,6 +48,14 @@ export default {
       meta: {
         title: "Aria2管理"
       }
+    },
+    {
+      path: "/system/rss",
+      name: "Rss",
+      component: () => import("@/views/rss/index.vue"),
+      meta: {
+        title: "RSS阅读器"
+      }
     }
   ]
 } satisfies RouteConfigsTable;

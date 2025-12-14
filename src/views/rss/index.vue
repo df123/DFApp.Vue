@@ -46,6 +46,25 @@
         </el-row>
       </div>
 
+      <!-- 下载选项 -->
+      <div class="download-options" style="margin-bottom: 20px">
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-checkbox v-model="videoOnly">
+              只下载视频文件（仅支持.torrent文件）
+            </el-checkbox>
+            <el-tooltip
+              content="启用后，下载.torrent文件时只选择视频文件（如.mp4, .mkv等）"
+              placement="top"
+            >
+              <el-icon style="margin-left: 8px">
+                <QuestionFilled />
+              </el-icon>
+            </el-tooltip>
+          </el-col>
+        </el-row>
+      </div>
+
       <!-- 自定义查询表单 -->
       <el-divider content-position="left">自定义查询</el-divider>
       <el-form
@@ -212,7 +231,7 @@
                 <el-button
                   link
                   type="success"
-                  @click="downloadToAria2(scope.row.link)"
+                  @click="downloadToAria2(scope.row.link, videoOnly)"
                 >
                   下载
                 </el-button>
@@ -236,6 +255,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { QuestionFilled } from "@element-plus/icons-vue";
 import { rssFetchApi } from "@/api/rssFetch";
 import { aria2Api } from "@/api/aria2";
 import type {
@@ -274,6 +294,9 @@ const resultList = ref<any[]>([]);
 // 详情对话框
 const detailDialogVisible = ref(false);
 const currentDetail = ref<any>({});
+
+// 视频下载选项
+const videoOnly = ref(false);
 
 // 获取RSS Feed
 const fetchRssFeed = async () => {
@@ -376,11 +399,12 @@ const openLink = (url: string) => {
 };
 
 // 添加到aria2下载
-const downloadToAria2 = async (url: string) => {
+const downloadToAria2 = async (url: string, videoOnly: boolean = false) => {
   try {
     const request: AddDownloadRequestDto = {
       urls: [url],
-      savePath: undefined // 可选：可以添加保存路径配置
+      savePath: undefined, // 可选：可以添加保存路径配置
+      videoOnly: videoOnly
     };
     await aria2Api.addDownload(request);
     ElMessage.success("已添加到下载队列");

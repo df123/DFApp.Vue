@@ -26,6 +26,8 @@ export interface TellStatusResultDto {
 export interface AddDownloadRequestDto {
   urls: string[];
   savePath?: string;
+  options?: Record<string, any>;
+  videoOnly?: boolean;
 }
 
 // 添加下载响应

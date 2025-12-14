@@ -1,6 +1,10 @@
 import { http } from "@/utils/http";
 import type { PagedRequestDto, PagedResultDto } from "../types/api";
-import type { TellStatusResultDto } from "../types/business";
+import type {
+  TellStatusResultDto,
+  AddDownloadRequestDto,
+  AddDownloadResponseDto
+} from "../types/business";
 
 class Aria2Api {
   private baseUrl = "/api/app/aria2";
@@ -47,6 +51,15 @@ class Aria2Api {
    */
   async clearDownloadDirectory(): Promise<void> {
     return http.post(`${this.baseUrl}/clear-download-directory`);
+  }
+
+  /**
+   * 添加下载任务
+   */
+  async addDownload(
+    request: AddDownloadRequestDto
+  ): Promise<AddDownloadResponseDto> {
+    return http.post(`${this.baseUrl}/add-download`, { data: request });
   }
 }
 

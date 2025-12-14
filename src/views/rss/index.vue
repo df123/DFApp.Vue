@@ -200,7 +200,7 @@
               min-width="200"
               show-overflow-tooltip
             />
-            <el-table-column prop="link" label="链接" width="100">
+            <el-table-column prop="link" label="链接" width="160">
               <template #default="scope">
                 <el-button
                   link
@@ -208,6 +208,13 @@
                   @click="openLink(scope.row.link)"
                 >
                   打开
+                </el-button>
+                <el-button
+                  link
+                  type="success"
+                  @click="downloadToAria2(scope.row.link)"
+                >
+                  下载
                 </el-button>
               </template>
             </el-table-column>
@@ -230,11 +237,13 @@
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { rssFetchApi } from "@/api/rssFetch";
+import { aria2Api } from "@/api/aria2";
 import type {
   RssFetchRequestDto,
   RssFetchResponseDto,
   RssItemDto
 } from "@/api/rssFetch";
+import type { AddDownloadRequestDto } from "@/types/business";
 
 // 默认URL
 const defaultUrl = ref("https://sukebei.nyaa.si/?page=rss");
@@ -364,6 +373,21 @@ const showDetail = (row: any) => {
 // 打开链接
 const openLink = (url: string) => {
   window.open(url, "_blank");
+};
+
+// 添加到aria2下载
+const downloadToAria2 = async (url: string) => {
+  try {
+    const request: AddDownloadRequestDto = {
+      urls: [url],
+      savePath: undefined // 可选：可以添加保存路径配置
+    };
+    await aria2Api.addDownload(request);
+    ElMessage.success("已添加到下载队列");
+  } catch (error) {
+    console.error("添加到下载队列失败:", error);
+    ElMessage.error("添加到下载队列失败");
+  }
 };
 
 // 生命周期

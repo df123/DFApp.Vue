@@ -29,7 +29,7 @@ class Aria2Api {
    * 获取所有外部链接
    * @param videoOnly 是否只获取视频文件链接
    */
-  async getAllExternalLinks(videoOnly: boolean = false): Promise<string[]> {
+  async getAllExternalLinks(videoOnly: boolean = true): Promise<string[]> {
     return http.get(`${this.baseUrl}/external-links`, {
       params: { videoOnly }
     });

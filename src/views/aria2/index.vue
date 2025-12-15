@@ -108,7 +108,7 @@ const loading = ref(false);
 const tableRef = ref();
 const linkDialogVisible = ref(false);
 const linkContent = ref("");
-const videoOnly = ref(false);
+const videoOnly = ref(true);
 
 // 分页数据
 const pagination = reactive({

@@ -296,7 +296,7 @@ const detailDialogVisible = ref(false);
 const currentDetail = ref<any>({});
 
 // 视频下载选项
-const videoOnly = ref(false);
+const videoOnly = ref(true);
 
 // 获取RSS Feed
 const fetchRssFeed = async () => {

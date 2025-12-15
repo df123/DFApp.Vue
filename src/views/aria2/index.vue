@@ -13,6 +13,9 @@
               <el-icon><Link /></el-icon>
               获取全部链接
             </el-button>
+            <div v-permission="['DFApp.Aria2.Link']" class="video-only-switch">
+              <el-switch v-model="videoOnly" active-text="只获取视频文件" />
+            </div>
             <el-button
               v-permission="['DFApp.Aria2.Delete']"
               type="danger"
@@ -105,6 +108,7 @@ const loading = ref(false);
 const tableRef = ref();
 const linkDialogVisible = ref(false);
 const linkContent = ref("");
+const videoOnly = ref(false);
 
 // 分页数据
 const pagination = reactive({
@@ -216,7 +220,7 @@ const handleGetLink = async (row: TellStatusResultDto) => {
 
 const handleGetAllLinks = async () => {
   try {
-    const links = await aria2Api.getAllExternalLinks();
+    const links = await aria2Api.getAllExternalLinks(videoOnly.value);
     linkContent.value = links.join("\n");
     linkDialogVisible.value = true;
   } catch (error) {
@@ -357,5 +361,10 @@ onMounted(() => {
 .card-actions {
   display: flex;
   gap: 10px;
+  align-items: center;
+}
+
+.video-only-switch {
+  margin-left: 5px;
 }
 </style>

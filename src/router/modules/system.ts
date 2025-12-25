@@ -56,6 +56,14 @@ export default {
       meta: {
         title: "RSS阅读器"
       }
+    },
+    {
+      path: "/system/filterKeyword",
+      name: "FilterKeyword",
+      component: () => import("@/views/filterKeyword/index.vue"),
+      meta: {
+        title: "关键词过滤管理"
+      }
     }
   ]
 } satisfies RouteConfigsTable;

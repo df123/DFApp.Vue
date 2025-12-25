@@ -63,6 +63,21 @@
             </el-tooltip>
           </el-col>
         </el-row>
+        <el-row :gutter="20" style="margin-top: 10px">
+          <el-col :span="24">
+            <el-checkbox v-model="enableKeywordFilter">
+              启用关键词过滤
+            </el-checkbox>
+            <el-tooltip
+              content="启用后，下载前会根据关键词过滤规则过滤文件名"
+              placement="top"
+            >
+              <el-icon style="margin-left: 8px">
+                <QuestionFilled />
+              </el-icon>
+            </el-tooltip>
+          </el-col>
+        </el-row>
       </div>
 
       <!-- 自定义查询表单 -->
@@ -298,6 +313,9 @@ const currentDetail = ref<any>({});
 // 视频下载选项
 const videoOnly = ref(true);
 
+// 关键词过滤选项
+const enableKeywordFilter = ref(true);
+
 // 获取RSS Feed
 const fetchRssFeed = async () => {
   fetchLoading.value = true;
@@ -404,7 +422,8 @@ const downloadToAria2 = async (url: string, videoOnly: boolean = false) => {
     const request: AddDownloadRequestDto = {
       urls: [url],
       savePath: undefined, // 可选：可以添加保存路径配置
-      videoOnly: videoOnly
+      videoOnly: videoOnly,
+      enableKeywordFilter: enableKeywordFilter.value
     };
     await aria2Api.addDownload(request);
     ElMessage.success("已添加到下载队列");

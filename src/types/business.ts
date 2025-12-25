@@ -28,6 +28,7 @@ export interface AddDownloadRequestDto {
   savePath?: string;
   options?: Record<string, any>;
   videoOnly?: boolean;
+  enableKeywordFilter?: boolean;
 }
 
 // 添加下载响应
@@ -481,4 +482,64 @@ export interface CompoundLotteryResultDto {
   TotalAmount: number;
   CreatedLotteries: LotteryDto[];
   CombinationDetails: string[];
+}
+
+// 文件关键词过滤模块类型
+
+// 匹配模式枚举
+export enum MatchMode {
+  Contains = 0, // 包含
+  StartsWith = 1, // 开头
+  EndsWith = 2, // 结尾
+  Exact = 3, // 完全匹配
+  Regex = 4 // 正则表达式
+}
+
+// 过滤类型枚举
+export enum FilterType {
+  Blacklist = 0, // 黑名单
+  Whitelist = 1 // 白名单
+}
+
+// 关键词过滤规则DTO
+export interface KeywordFilterRuleDto {
+  id: number;
+  creationTime?: string;
+  keyword: string;
+  matchMode: MatchMode;
+  filterType: FilterType;
+  isEnabled: boolean;
+  priority: number;
+  remark?: string;
+  isCaseSensitive: boolean;
+}
+
+// 创建/更新关键词过滤规则DTO
+export interface CreateUpdateKeywordFilterRuleDto {
+  keyword: string;
+  matchMode: MatchMode;
+  filterType: FilterType;
+  isEnabled: boolean;
+  priority: number;
+  remark?: string;
+  isCaseSensitive: boolean;
+}
+
+// 关键词过滤匹配结果DTO
+export interface KeywordFilterMatchResultDto {
+  ruleId: number;
+  keyword: string;
+  matchMode: MatchMode;
+  filterType: FilterType;
+  priority: number;
+  isCaseSensitive: boolean;
+  matchedText?: string;
+}
+
+// 关键词过滤测试结果DTO
+export interface KeywordFilterTestResultDto {
+  fileName: string;
+  shouldFilter: boolean;
+  matchingRules: KeywordFilterMatchResultDto[];
+  reason?: string;
 }

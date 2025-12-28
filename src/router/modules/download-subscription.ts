@@ -1,0 +1,36 @@
+export default {
+  path: "/download-subscription",
+  name: "DownloadSubscription",
+  redirect: "/download-subscription/aria2",
+  meta: {
+    title: "下载与订阅",
+    icon: "ep:download",
+    rank: 4
+  },
+  children: [
+    {
+      path: "/download-subscription/aria2",
+      name: "Aria2",
+      component: () => import("@/views/aria2/index.vue"),
+      meta: {
+        title: "Aria2管理"
+      }
+    },
+    {
+      path: "/download-subscription/rss",
+      name: "Rss",
+      component: () => import("@/views/rss/index.vue"),
+      meta: {
+        title: "RSS阅读器"
+      }
+    },
+    {
+      path: "/download-subscription/filterKeyword",
+      name: "FilterKeyword",
+      component: () => import("@/views/filterKeyword/index.vue"),
+      meta: {
+        title: "关键词过滤管理"
+      }
+    }
+  ]
+} satisfies RouteConfigsTable;

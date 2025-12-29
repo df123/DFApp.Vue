@@ -4,6 +4,10 @@ import { http } from "@/utils/http";
 export interface RssFetchRequestDto {
   url?: string;
   maxItems?: number;
+  query?: string;
+  proxyUrl?: string;
+  proxyUsername?: string;
+  proxyPassword?: string;
 }
 
 // RSS条目DTO
@@ -14,6 +18,9 @@ export interface RssItemDto {
   publishDate?: string;
   author: string;
   category: string;
+  seeders?: number;
+  leechers?: number;
+  downloads?: number;
   extensions: Record<string, string>;
 }
 
@@ -38,13 +45,6 @@ export class RssFetchApi {
     request: RssFetchRequestDto
   ): Promise<RssFetchResponseDto> {
     return http.post(`${this.baseUrl}/fetch-rss-feed`, { data: request });
-  }
-
-  // POST /api/app/rss-fetch/test-rss-feed-connection
-  async testRssFeedConnection(url: string): Promise<RssFetchResponseDto> {
-    return http.post(`${this.baseUrl}/test-rss-feed-connection`, {
-      params: { url }
-    });
   }
 }
 

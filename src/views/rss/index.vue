@@ -7,45 +7,6 @@
         </div>
       </template>
 
-      <!-- 快速操作区域 -->
-      <div class="quick-actions">
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-button
-              type="primary"
-              :loading="fetchLoading"
-              style="width: 100%"
-              @click="fetchRssFeed"
-            >
-              获取RSS内容
-            </el-button>
-          </el-col>
-          <el-col :span="6">
-            <el-button
-              type="success"
-              :loading="testLoading"
-              style="width: 100%"
-              @click="testRssConnection"
-            >
-              测试RSS连接
-            </el-button>
-          </el-col>
-          <el-col :span="12">
-            <el-input
-              v-model="defaultUrl"
-              placeholder="请输入RSS Feed URL"
-              clearable
-              @clear="clearUrl"
-            >
-              <template #prepend>默认URL</template>
-              <template #append>
-                <el-button @click="setDefaultUrl">应用</el-button>
-              </template>
-            </el-input>
-          </el-col>
-        </el-row>
-      </div>
-
       <!-- 下载选项 -->
       <div class="download-options" style="margin-bottom: 20px">
         <el-row :gutter="20">
@@ -78,6 +39,19 @@
             </el-tooltip>
           </el-col>
         </el-row>
+        <el-row :gutter="20" style="margin-top: 10px">
+          <el-col :span="24">
+            <el-checkbox v-model="enableProxy"> 启用代理 </el-checkbox>
+            <el-tooltip
+              content="启用后，通过代理服务器访问RSS Feed"
+              placement="top"
+            >
+              <el-icon style="margin-left: 8px">
+                <QuestionFilled />
+              </el-icon>
+            </el-tooltip>
+          </el-col>
+        </el-row>
       </div>
 
       <!-- 自定义查询表单 -->
@@ -102,6 +76,19 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
+            <el-form-item label="搜索关键词">
+              <el-input
+                v-model="formData.query"
+                placeholder="输入搜索关键词"
+                clearable
+              >
+                <template #prepend>
+                  <el-icon><Search /></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="最大条目数" prop="maxItems">
               <el-input-number
                 v-model="formData.maxItems"
@@ -111,11 +98,48 @@
               />
             </el-form-item>
           </el-col>
-          <el-col :span="12" style="text-align: center">
+        </el-row>
+        <template v-if="enableProxy">
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item label="代理地址">
+                <el-input
+                  v-model="formData.proxyUrl"
+                  placeholder="例如：http://127.0.0.1:7890 或 socks5://127.0.0.1:1080"
+                  clearable
+                />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="代理用户名">
+                <el-input
+                  v-model="formData.proxyUsername"
+                  placeholder="可选"
+                  clearable
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="代理密码">
+                <el-input
+                  v-model="formData.proxyPassword"
+                  type="password"
+                  placeholder="可选"
+                  clearable
+                  show-password
+                />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </template>
+        <el-row :gutter="20">
+          <el-col :span="24" style="text-align: center">
             <el-button
               type="primary"
               :loading="customLoading"
-              style="width: 200px; margin-top: 30px"
+              style="width: 200px"
               @click="fetchCustomRss"
             >
               开始获取
@@ -305,7 +329,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
-import { QuestionFilled } from "@element-plus/icons-vue";
+import { QuestionFilled, Search } from "@element-plus/icons-vue";
 import { rssFetchApi } from "@/api/rssFetch";
 import { aria2Api } from "@/api/aria2";
 import type {
@@ -315,14 +339,15 @@ import type {
 } from "@/api/rssFetch";
 import type { AddDownloadRequestDto } from "@/types/business";
 
-// 默认URL
-const defaultUrl = ref("https://sukebei.nyaa.si/?page=rss");
-
 // 表单相关
 const formRef = ref<FormInstance>();
 const formData = reactive<RssFetchRequestDto>({
-  url: defaultUrl.value,
-  maxItems: 50
+  url: "https://sukebei.nyaa.si/?page=rss",
+  maxItems: 50,
+  query: "",
+  proxyUrl: "",
+  proxyUsername: "",
+  proxyPassword: ""
 });
 
 const formRules: FormRules = {
@@ -332,9 +357,10 @@ const formRules: FormRules = {
   ]
 };
 
+// 代理相关
+const enableProxy = ref(false);
+
 // 加载状态
-const fetchLoading = ref(false);
-const testLoading = ref(false);
 const customLoading = ref(false);
 const resultLoading = ref(false);
 
@@ -350,40 +376,6 @@ const videoOnly = ref(true);
 
 // 关键词过滤选项
 const enableKeywordFilter = ref(true);
-
-// 获取RSS Feed
-const fetchRssFeed = async () => {
-  fetchLoading.value = true;
-  try {
-    const request: RssFetchRequestDto = {
-      url: defaultUrl.value,
-      maxItems: 50
-    };
-    const result = await rssFetchApi.fetchRssFeed(request);
-    addResult("获取RSS内容", defaultUrl.value, result);
-    ElMessage.success("RSS内容获取完成");
-  } catch (error) {
-    console.error("获取RSS内容失败:", error);
-    ElMessage.error("获取RSS内容失败");
-  } finally {
-    fetchLoading.value = false;
-  }
-};
-
-// 测试RSS连接
-const testRssConnection = async () => {
-  testLoading.value = true;
-  try {
-    const result = await rssFetchApi.testRssFeedConnection(defaultUrl.value);
-    addResult("测试RSS连接", defaultUrl.value, result);
-    ElMessage.success("RSS连接测试完成");
-  } catch (error) {
-    console.error("测试RSS连接失败:", error);
-    ElMessage.error("测试RSS连接失败");
-  } finally {
-    testLoading.value = false;
-  }
-};
 
 // 自定义获取
 const fetchCustomRss = async () => {
@@ -403,17 +395,6 @@ const fetchCustomRss = async () => {
   } finally {
     customLoading.value = false;
   }
-};
-
-// 设置默认URL
-const setDefaultUrl = () => {
-  formData.url = defaultUrl.value;
-  ElMessage.success("已应用默认URL到表单");
-};
-
-// 清空URL
-const clearUrl = () => {
-  defaultUrl.value = "";
 };
 
 // 添加结果到列表

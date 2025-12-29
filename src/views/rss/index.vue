@@ -253,11 +253,46 @@
               </template>
             </el-table-column>
             <el-table-column prop="publishDate" label="发布日期" width="180" />
-            <el-table-column prop="author" label="作者" width="120" />
-            <el-table-column prop="category" label="分类" width="120" />
-            <el-table-column label="描述" min-width="200" show-overflow-tooltip>
+            <el-table-column prop="seeders" label="做种人数" width="100">
               <template #default="scope">
-                <div class="description-cell" v-html="scope.row.description" />
+                <el-tag
+                  v-if="
+                    scope.row.seeders !== null &&
+                    scope.row.seeders !== undefined
+                  "
+                  type="success"
+                >
+                  {{ scope.row.seeders }}
+                </el-tag>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="leechers" label="下载人数" width="100">
+              <template #default="scope">
+                <el-tag
+                  v-if="
+                    scope.row.leechers !== null &&
+                    scope.row.leechers !== undefined
+                  "
+                  type="warning"
+                >
+                  {{ scope.row.leechers }}
+                </el-tag>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="downloads" label="完成下载" width="100">
+              <template #default="scope">
+                <el-tag
+                  v-if="
+                    scope.row.downloads !== null &&
+                    scope.row.downloads !== undefined
+                  "
+                  type="info"
+                >
+                  {{ scope.row.downloads }}
+                </el-tag>
+                <span v-else>-</span>
               </template>
             </el-table-column>
           </el-table>

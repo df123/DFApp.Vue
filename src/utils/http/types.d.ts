@@ -25,6 +25,7 @@ export interface PureHttpResponse extends AxiosResponse {
 export interface PureHttpRequestConfig extends AxiosRequestConfig {
   beforeRequestCallback?: (request: PureHttpRequestConfig) => void;
   beforeResponseCallback?: (response: PureHttpResponse) => void;
+  _retry?: boolean; // 标记请求是否已经重试过（用于 CSRF token 刷新）
 }
 
 export default class PureHttp {
@@ -40,6 +41,21 @@ export default class PureHttp {
     config?: PureHttpRequestConfig
   ): Promise<T>;
   get<T, P>(
+    url: string,
+    params?: P,
+    config?: PureHttpRequestConfig
+  ): Promise<T>;
+  put<T, P>(
+    url: string,
+    params?: P,
+    config?: PureHttpRequestConfig
+  ): Promise<T>;
+  delete<T, P>(
+    url: string,
+    params?: P,
+    config?: PureHttpRequestConfig
+  ): Promise<T>;
+  patch<T, P>(
     url: string,
     params?: P,
     config?: PureHttpRequestConfig

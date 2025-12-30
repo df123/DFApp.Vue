@@ -28,6 +28,7 @@ export async function refreshCsrfToken(httpInstance: PureHttp = http) {
     console.log("CSRF token refreshed successfully");
   } catch (error) {
     console.warn("Failed to refresh CSRF token:", error);
+    throw error;
   }
 }
 
@@ -124,11 +125,71 @@ class PureHttp {
         }
         return response.data;
       },
-      (error: PureHttpError) => {
+      async (error: PureHttpError) => {
         const $error = error;
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画
         NProgress.done();
+
+        // 检查是否是 anti-forgery token 失效导致的 400 错误
+        // ABP框架的anti-forgery验证失败通常返回400，且响应体可能为空
+        if (
+          $error.response &&
+          $error.response.status === 400 &&
+          !($error.config as any)._retry
+        ) {
+          // 对于非GET请求的400错误，尝试刷新token并重试
+          const method = ($error.config.method || "").toLowerCase();
+          const isModifyRequest = ["post", "put", "delete", "patch"].includes(
+            method
+          );
+
+          // 检查错误响应中是否包含 anti-forgery 相关信息
+          const responseData = $error.response.data as any;
+          const hasAntiForgeryInfo =
+            responseData?.error?.details
+              ?.toLowerCase()
+              .includes("antiforgery") ||
+            responseData?.error?.message
+              ?.toLowerCase()
+              .includes("antiforgery") ||
+            $error.response.headers["x-csrf-error"] !== undefined;
+
+          // 如果是修改请求且可能是anti-forgery错误，或者明确包含anti-forgery信息
+          if (
+            isModifyRequest &&
+            (hasAntiForgeryInfo ||
+              !responseData ||
+              Object.keys(responseData || {}).length === 0)
+          ) {
+            console.log(
+              "检测到可能的 Anti-forgery token 验证失败(400)，正在刷新 token 并重试请求..."
+            );
+
+            // 标记已经重试过，避免无限循环
+            ($error.config as any)._retry = true;
+
+            try {
+              // 刷新 CSRF token
+              await refreshCsrfToken();
+
+              // 重新获取最新的 CSRF token 并更新请求头
+              const newCsrfToken = getCsrfToken();
+              if (newCsrfToken) {
+                $error.config.headers["RequestVerificationToken"] =
+                  newCsrfToken;
+              }
+
+              // 重试原请求
+              return instance.request($error.config);
+            } catch (refreshError) {
+              console.error("刷新 CSRF token 失败:", refreshError);
+              // 如果刷新失败，返回原始错误
+              return Promise.reject($error);
+            }
+          }
+        }
+
         // 所有的响应异常 区分来源为取消请求/非取消请求
         return Promise.reject($error);
       }
@@ -187,6 +248,33 @@ class PureHttp {
     config?: PureHttpRequestConfig
   ): Promise<T> {
     return this.request<T>("get", url, params, config);
+  }
+
+  /** 单独抽离的`put`工具函数 */
+  public put<T, P>(
+    url: string,
+    params?: AxiosRequestConfig<P>,
+    config?: PureHttpRequestConfig
+  ): Promise<T> {
+    return this.request<T>("put", url, params, config);
+  }
+
+  /** 单独抽离的`delete`工具函数 */
+  public delete<T, P>(
+    url: string,
+    params?: AxiosRequestConfig<P>,
+    config?: PureHttpRequestConfig
+  ): Promise<T> {
+    return this.request<T>("delete", url, params, config);
+  }
+
+  /** 单独抽离的`patch`工具函数 */
+  public patch<T, P>(
+    url: string,
+    params?: AxiosRequestConfig<P>,
+    config?: PureHttpRequestConfig
+  ): Promise<T> {
+    return this.request<T>("patch", url, params, config);
   }
 }
 

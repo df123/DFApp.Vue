@@ -25,6 +25,13 @@ export interface PermissionsResultDto {
   groups: PermissionGroupDto[];
 }
 
+export interface UpdatePermissionsDto {
+  permissions: {
+    name: string;
+    isGranted: boolean;
+  }[];
+}
+
 class PermissionApi {
   private baseUrl = "/api/permission-management/permissions";
 
@@ -46,6 +53,26 @@ class PermissionApi {
   }
 
   /**
+   * 更新权限
+   * @param providerName 权限提供者类型 (R: Role, U: User)
+   * @param providerKey 提供者标识 (角色名或用户ID)
+   * @param data 权限更新数据
+   */
+  async updatePermissions(
+    providerName: string,
+    providerKey: string,
+    data: UpdatePermissionsDto
+  ): Promise<void> {
+    return http.put(this.baseUrl, {
+      params: {
+        providerName,
+        providerKey
+      },
+      data: data
+    });
+  }
+
+  /**
    * 获取用户权限
    * @param userId 用户ID
    */
@@ -59,6 +86,30 @@ class PermissionApi {
    */
   async getRolePermissions(roleName: string): Promise<PermissionsResultDto> {
     return this.getPermissions("R", roleName);
+  }
+
+  /**
+   * 更新用户权限
+   * @param userId 用户ID
+   * @param permissions 权限数据
+   */
+  async updateUserPermissions(
+    userId: string,
+    permissions: { name: string; isGranted: boolean }[]
+  ): Promise<void> {
+    return this.updatePermissions("U", userId, { permissions });
+  }
+
+  /**
+   * 更新角色权限
+   * @param roleName 角色名
+   * @param permissions 权限数据
+   */
+  async updateRolePermissions(
+    roleName: string,
+    permissions: { name: string; isGranted: boolean }[]
+  ): Promise<void> {
+    return this.updatePermissions("R", roleName, { permissions });
   }
 }
 

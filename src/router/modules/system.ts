@@ -40,6 +40,14 @@ export default {
       meta: {
         title: "日志查看器"
       }
+    },
+    {
+      path: "/system/permission-management",
+      name: "PermissionManagement",
+      component: () => import("@/views/permission/management/index.vue"),
+      meta: {
+        title: "权限管理"
+      }
     }
   ]
 } satisfies RouteConfigsTable;

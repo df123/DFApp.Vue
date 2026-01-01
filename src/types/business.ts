@@ -167,6 +167,16 @@ export interface Aria2ConnectionStatusDto {
   errorMessage?: string;
 }
 
+// IP 地理位置 DTO
+export interface IpGeolocationDto {
+  status: string;
+  query: string;
+  country?: string;
+  countryCode?: string;
+  city?: string;
+  message?: string;
+}
+
 // 外部链接响应
 export interface ExternalLinkResponseDto {
   link: string;

@@ -12,7 +12,8 @@ import type {
   PauseTasksRequestDto,
   StopTasksRequestDto,
   RemoveTasksRequestDto,
-  Aria2ConnectionStatusDto
+  Aria2ConnectionStatusDto,
+  IpGeolocationDto
 } from "../types/business";
 
 class Aria2Api {
@@ -210,6 +211,15 @@ class Aria2Api {
    */
   async getConnectionStatus(): Promise<Aria2ConnectionStatusDto> {
     return http.get(`${this.manageUrl}/connection-status`);
+  }
+
+  /**
+   * 批量查询 IP 地理位置（通过后端代理）
+   */
+  async getIpGeolocation(ips: string[]): Promise<IpGeolocationDto[]> {
+    return http.get(`${this.manageUrl}/ip-geolocation`, {
+      params: { Ips: ips }
+    });
   }
 }
 

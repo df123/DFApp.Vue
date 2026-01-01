@@ -227,7 +227,7 @@ const loadPeerCountries = async () => {
     // 构建批量查询请求体（最多100个IP）
     const ips = taskDetail.value.peers.map(peer => peer.ip);
 
-    const response = await fetch("https://ip-api.com/batch?lang=zh-CN", {
+    const response = await fetch("http://ip-api.com/batch?lang=zh-CN", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

@@ -114,12 +114,11 @@
                 {{ row.country || "查询中..." }}
               </template>
             </el-table-column>
-            <el-table-column
-              prop="client"
-              label="客户端"
-              min-width="150"
-              show-overflow-tooltip
-            />
+            <el-table-column label="城市" width="120">
+              <template #default="{ row }">
+                {{ row.city || "-" }}
+              </template>
+            </el-table-column>
             <el-table-column label="进度" width="120">
               <template #default="{ row }">
                 {{ (row.progress * 100).toFixed(1) }}%
@@ -220,27 +219,42 @@ const loadTaskDetail = async () => {
   }
 };
 
-// 查询peer的国家信息
+// 查询peer的国家和城市信息
 const loadPeerCountries = async () => {
   if (!taskDetail.value?.peers) return;
 
-  // 使用免费的IP地理位置API
-  const promises = taskDetail.value.peers.map(async peer => {
-    try {
-      const response = await fetch(
-        `http://ip-api.com/json/${peer.ip}?lang=zh-CN`
-      );
-      const data = await response.json();
-      if (data.status === "success") {
-        peer.country = data.country || "";
-      }
-    } catch (error) {
-      console.error(`查询IP ${peer.ip} 的国家信息失败:`, error);
-      peer.country = "未知";
-    }
-  });
+  try {
+    // 构建批量查询请求体（最多100个IP）
+    const ips = taskDetail.value.peers.map(peer => peer.ip);
 
-  await Promise.all(promises);
+    const response = await fetch("http://ip-api.com/batch?lang=zh-CN", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(ips)
+    });
+
+    const data = await response.json();
+
+    // 将批量响应映射回对应的peer
+    data.forEach((item: any, index: number) => {
+      if (item.status === "success") {
+        taskDetail.value!.peers[index].country = item.country || "";
+        taskDetail.value!.peers[index].city = item.city || "";
+      } else {
+        taskDetail.value!.peers[index].country = "未知";
+        taskDetail.value!.peers[index].city = "";
+      }
+    });
+  } catch (error) {
+    console.error("批量查询IP地理位置信息失败:", error);
+    // 如果批量请求失败，将所有国家设置为未知
+    taskDetail.value.peers.forEach(peer => {
+      peer.country = "未知";
+      peer.city = "";
+    });
+  }
 };
 
 // 刷新详情

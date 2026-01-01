@@ -108,6 +108,7 @@ export interface Aria2PeerDto {
   progress: number;
   seeder: boolean;
   country?: string; // 前端添加的国家字段
+  city?: string; // 前端添加的城市字段
 }
 
 // Aria2 任务详情（包含完整信息）

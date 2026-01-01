@@ -36,6 +36,136 @@ export interface AddDownloadResponseDto {
   id: string;
 }
 
+// 批量添加 URI 下载请求（每条链接创建独立任务）
+export interface BatchAddUriRequestDto {
+  urls: string[];
+  savePath?: string;
+  options?: Record<string, any>;
+  videoOnly?: boolean;
+  enableKeywordFilter?: boolean;
+}
+
+// 种子文件项
+export interface TorrentFileItemDto {
+  torrentData: string;
+  fileName: string;
+}
+
+// 添加种子文件下载请求
+export interface AddTorrentRequestDto {
+  torrentData: string;
+  savePath?: string;
+  options?: Record<string, any>;
+}
+
+// 批量添加种子文件下载请求
+export interface BatchAddTorrentRequestDto {
+  torrents: TorrentFileItemDto[];
+  savePath?: string;
+}
+
+// Aria2 管理相关类型
+
+// Aria2 全局状态
+export interface Aria2GlobalStatDto {
+  downloadSpeed: string;
+  uploadSpeed: string;
+  activeCount: string;
+  waitingCount: string;
+  stoppedCount: string;
+  stoppedTotal: string;
+}
+
+// Aria2 任务信息
+export interface Aria2TaskDto {
+  gid: string;
+  status: string;
+  totalLength: number;
+  completedLength: number;
+  downloadSpeed: number;
+  uploadSpeed: number;
+  errorCode?: string;
+  errorMessage?: string;
+  files?: Aria2FileDto[];
+  dir?: string;
+  connections?: number;
+  shareRatio?: number;
+  uploadedLength?: number;
+  btName?: string;
+  peers?: Aria2PeerDto[];
+}
+
+// Aria2 Peer信息（BitTorrent对等连接）
+export interface Aria2PeerDto {
+  peerId: string;
+  ip: string;
+  port: number;
+  client?: string;
+  amChoking: boolean;
+  peerChoking: boolean;
+  downloadSpeed: number;
+  uploadSpeed: number;
+  progress: number;
+  seeder: boolean;
+  country?: string; // 前端添加的国家字段
+}
+
+// Aria2 任务详情（包含完整信息）
+export interface Aria2TaskDetailDto {
+  gid: string;
+  status: string;
+  btName?: string;
+  totalLength: number;
+  completedLength: number;
+  uploadedLength: number;
+  shareRatio: number;
+  downloadSpeed: number;
+  uploadSpeed: number;
+  dir?: string;
+  files: Aria2FileDto[];
+  peers: Aria2PeerDto[];
+  connections?: number;
+}
+
+// Aria2 文件信息
+export interface Aria2FileDto {
+  index: string;
+  path: string;
+  length: number;
+  completedLength: number;
+  selected: boolean;
+  uris?: Aria2UriDto[];
+}
+
+// Aria2 URI 信息
+export interface Aria2UriDto {
+  uri: string;
+  status: string;
+}
+
+// 暂停任务请求
+export interface PauseTasksRequestDto {
+  gids: string[];
+}
+
+// 停止任务请求
+export interface StopTasksRequestDto {
+  gids: string[];
+}
+
+// 删除任务请求
+export interface RemoveTasksRequestDto {
+  gids: string[];
+}
+
+// Aria2 连接状态
+export interface Aria2ConnectionStatusDto {
+  isConnected: boolean;
+  version?: string;
+  sessionInfo?: string;
+  errorMessage?: string;
+}
+
 // 外部链接响应
 export interface ExternalLinkResponseDto {
   link: string;

@@ -3,11 +3,21 @@ import type { PagedRequestDto, PagedResultDto } from "../types/api";
 import type {
   TellStatusResultDto,
   AddDownloadRequestDto,
-  AddDownloadResponseDto
+  AddDownloadResponseDto,
+  AddTorrentRequestDto,
+  BatchAddTorrentRequestDto,
+  Aria2GlobalStatDto,
+  Aria2TaskDto,
+  Aria2TaskDetailDto,
+  PauseTasksRequestDto,
+  StopTasksRequestDto,
+  RemoveTasksRequestDto,
+  Aria2ConnectionStatusDto
 } from "../types/business";
 
 class Aria2Api {
   private baseUrl = "/api/app/aria2";
+  private manageUrl = "/api/app/aria2Manage";
 
   /**
    * 获取下载状态列表
@@ -63,6 +73,143 @@ class Aria2Api {
     request: AddDownloadRequestDto
   ): Promise<AddDownloadResponseDto> {
     return http.post(`${this.baseUrl}/add-download`, { data: request });
+  }
+
+  // ============ Aria2 管理相关 API (直接连接 aria2 RPC) ============
+
+  /**
+   * 获取 Aria2 全局状态
+   */
+  async getGlobalStat(): Promise<Aria2GlobalStatDto> {
+    return http.get(`${this.manageUrl}/global-stat`);
+  }
+
+  /**
+   * 获取活跃任务列表
+   */
+  async getActiveTasks(): Promise<Aria2TaskDto[]> {
+    return http.get(`${this.manageUrl}/active-tasks`);
+  }
+
+  /**
+   * 获取等待任务列表
+   */
+  async getWaitingTasks(): Promise<Aria2TaskDto[]> {
+    return http.get(`${this.manageUrl}/waiting-tasks`);
+  }
+
+  /**
+   * 获取停止任务列表
+   */
+  async getStoppedTasks(
+    offset: number = 0,
+    num: number = 100
+  ): Promise<Aria2TaskDto[]> {
+    return http.get(`${this.manageUrl}/stopped-tasks`, {
+      params: { offset, num }
+    });
+  }
+
+  /**
+   * 获取任务状态
+   */
+  async getTaskStatus(gid: string): Promise<Aria2TaskDto> {
+    return http.get(`${this.manageUrl}/task-status`, {
+      params: { gid }
+    });
+  }
+
+  /**
+   * 获取任务详情（包含peers和文件列表）
+   */
+  async getTaskDetail(gid: string): Promise<Aria2TaskDetailDto> {
+    return http.get(`${this.manageUrl}/task-detail`, {
+      params: { gid }
+    });
+  }
+
+  /**
+   * 添加 URI 下载任务
+   */
+  async addUri(request: AddDownloadRequestDto): Promise<string> {
+    return http.post(`${this.manageUrl}/uri`, { data: request });
+  }
+
+  /**
+   * 批量添加 URI 下载任务（每条链接创建独立任务）
+   */
+  async batchAddUri(request: BatchAddUriRequestDto): Promise<string[]> {
+    return http.post(`${this.manageUrl}/batch-add-uri`, { data: request });
+  }
+
+  /**
+   * 添加种子文件下载任务
+   */
+  async addTorrent(request: AddTorrentRequestDto): Promise<string> {
+    return http.post(`${this.manageUrl}/torrent`, { data: request });
+  }
+
+  /**
+   * 批量添加种子文件下载任务
+   */
+  async batchAddTorrent(request: BatchAddTorrentRequestDto): Promise<string[]> {
+    return http.post(`${this.manageUrl}/batch-add-torrent`, { data: request });
+  }
+
+  /**
+   * 暂停任务
+   */
+  async pauseTasks(request: PauseTasksRequestDto): Promise<string[]> {
+    return http.post(`${this.manageUrl}/pause-tasks`, { data: request });
+  }
+
+  /**
+   * 暂停所有任务
+   */
+  async pauseAllTasks(): Promise<string> {
+    return http.post(`${this.manageUrl}/pause-all-tasks`);
+  }
+
+  /**
+   * 恢复任务
+   */
+  async unpauseTasks(request: PauseTasksRequestDto): Promise<string[]> {
+    return http.post(`${this.manageUrl}/unpause-tasks`, { data: request });
+  }
+
+  /**
+   * 恢复所有任务
+   */
+  async unpauseAllTasks(): Promise<string> {
+    return http.post(`${this.manageUrl}/unpause-all-tasks`);
+  }
+
+  /**
+   * 停止任务
+   */
+  async stopTasks(request: StopTasksRequestDto): Promise<string[]> {
+    return http.post(`${this.manageUrl}/stop-tasks`, { data: request });
+  }
+
+  /**
+   * 删除停止的任务
+   */
+  async removeTasks(request: RemoveTasksRequestDto): Promise<string[]> {
+    return http.delete(`${this.manageUrl}/tasks`, { data: request });
+  }
+
+  /**
+   * 清空停止的任务
+   */
+  async purgeDownloadResult(): Promise<string> {
+    return http.post(`${this.manageUrl}/purge-download-result`);
+  }
+
+  /**
+   * 获取 Aria2 连接状态
+   */
+  async getConnectionStatus(): Promise<Aria2ConnectionStatusDto> {
+    return http.get(`${this.manageUrl}/connection-status`);
   }
 }
 

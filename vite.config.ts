@@ -41,6 +41,12 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
           target: VITE_AUTH_AUTHORITY,
           changeOrigin: true,
           secure: mode === "development" ? false : true
+        },
+        "/hubs": {
+          target: VITE_API_BASE_URL,
+          changeOrigin: true,
+          secure: mode === "development" ? false : true,
+          ws: true // 启用 WebSocket 代理
         }
       },
       // 预热文件以提前转换和缓存结果，降低启动期间的初始页面加载时长并防止转换瀑布

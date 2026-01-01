@@ -10,10 +10,18 @@ export default {
   children: [
     {
       path: "/download-subscription/aria2",
-      name: "Aria2",
+      name: "Aria2Subscription",
       component: () => import("@/views/aria2/index.vue"),
       meta: {
         title: "Aria2管理"
+      }
+    },
+    {
+      path: "/download-subscription/download-manage",
+      name: "DownloadManage",
+      component: () => import("@/views/aria2/manage.vue"),
+      meta: {
+        title: "下载管理"
       }
     },
     {

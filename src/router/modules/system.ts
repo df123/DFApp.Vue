@@ -48,6 +48,26 @@ export default {
       meta: {
         title: "权限管理"
       }
+    },
+    {
+      path: "/system/aria2",
+      name: "Aria2",
+      redirect: "/system/aria2/manage",
+      component: () => import("@/views/aria2/index.vue"),
+      meta: {
+        title: "Aria2 管理",
+        icon: "ep:download"
+      },
+      children: [
+        {
+          path: "/system/aria2/manage",
+          name: "Aria2Manage",
+          component: () => import("@/views/aria2/manage.vue"),
+          meta: {
+            title: "下载管理"
+          }
+        }
+      ]
     }
   ]
 } satisfies RouteConfigsTable;

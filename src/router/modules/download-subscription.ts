@@ -33,6 +33,22 @@ export default {
       }
     },
     {
+      path: "/download-subscription/rss-sources",
+      name: "RssSources",
+      component: () => import("@/views/rss-mirror/sources/index.vue"),
+      meta: {
+        title: "RSS源管理"
+      }
+    },
+    {
+      path: "/download-subscription/rss-mirror-items",
+      name: "RssMirrorItems",
+      component: () => import("@/views/rss-mirror/items/index.vue"),
+      meta: {
+        title: "RSS镜像条目"
+      }
+    },
+    {
       path: "/download-subscription/filterKeyword",
       name: "FilterKeyword",
       component: () => import("@/views/filterKeyword/index.vue"),

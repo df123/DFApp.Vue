@@ -684,3 +684,88 @@ export interface KeywordFilterTestResultDto {
   matchingRules: KeywordFilterMatchResultDto[];
   reason?: string;
 }
+
+// RSS镜像模块类型
+
+// RSS源DTO
+export interface RssSourceDto {
+  id: number;
+  name: string;
+  url: string;
+  proxyUrl?: string;
+  proxyUsername?: string;
+  proxyPassword?: string;
+  isEnabled: boolean;
+  fetchIntervalMinutes: number;
+  maxItems: number;
+  query?: string;
+  lastFetchTime?: string;
+  fetchStatus: number;
+  errorMessage?: string;
+  remark?: string;
+  creationTime: string;
+}
+
+// 创建/更新RSS源DTO
+export interface CreateUpdateRssSourceDto {
+  name: string;
+  url: string;
+  proxyUrl?: string;
+  proxyUsername?: string;
+  proxyPassword?: string;
+  isEnabled: boolean;
+  fetchIntervalMinutes: number;
+  maxItems: number;
+  query?: string;
+  remark?: string;
+}
+
+// RSS镜像条目DTO
+export interface RssMirrorItemDto {
+  id: number;
+  rssSourceId: number;
+  rssSourceName?: string;
+  title: string;
+  link: string;
+  description?: string;
+  author?: string;
+  category?: string;
+  publishDate?: string;
+  seeders?: number;
+  leechers?: number;
+  downloads?: number;
+  extensions?: string;
+  isDownloaded: boolean;
+  downloadTime?: string;
+  creationTime: string;
+  wordSegments?: RssWordSegmentDto[];
+}
+
+// RSS分词DTO
+export interface RssWordSegmentDto {
+  id?: number;
+  rssMirrorItemId: number;
+  word: string;
+  languageType: number;
+  count: number;
+  partOfSpeech?: string;
+  creationTime: string;
+}
+
+// 获取RSS镜像条目请求DTO
+export interface GetRssMirrorItemsRequestDto extends PagedRequestDto {
+  rssSourceId?: number;
+  filter?: string;
+  startTime?: string;
+  endTime?: string;
+  isDownloaded?: boolean;
+  wordToken?: string;
+}
+
+// 分词统计DTO
+export interface WordSegmentStatisticsDto {
+  word: string;
+  totalCount: number;
+  itemCount: number;
+  languageType: number;
+}

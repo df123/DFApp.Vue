@@ -49,6 +49,14 @@ export default {
       }
     },
     {
+      path: "/download-subscription/rss-word-segments",
+      name: "RssWordSegments",
+      component: () => import("@/views/rss/word-segments.vue"),
+      meta: {
+        title: "分词统计"
+      }
+    },
+    {
       path: "/download-subscription/filterKeyword",
       name: "FilterKeyword",
       component: () => import("@/views/filterKeyword/index.vue"),

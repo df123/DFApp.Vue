@@ -769,3 +769,26 @@ export interface WordSegmentStatisticsDto {
   itemCount: number;
   languageType: number;
 }
+
+// RSS分词（带镜像条目信息）DTO
+export interface RssWordSegmentWithItemDto {
+  id: number;
+  rssMirrorItemId: number;
+  rssMirrorItemTitle?: string;
+  rssMirrorItemLink?: string;
+  rssSourceId?: number;
+  rssSourceName?: string;
+  word: string;
+  languageType: number;
+  count: number;
+  partOfSpeech?: string;
+  creationTime: string;
+}
+
+// 获取RSS分词请求DTO
+export interface GetRssWordSegmentsRequestDto extends PagedRequestDto {
+  rssSourceId?: number;
+  filter?: string;
+  languageType?: number;
+  word?: string;
+}

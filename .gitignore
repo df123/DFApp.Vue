@@ -21,3 +21,9 @@ tests/**/coverage/
 *.sln
 tsconfig.tsbuildinfo
 .env.development
+
+# Playwright
+playwright-report/
+test-results/
+playwright/.auth/*.json
+!playwright/.auth/.gitkeep

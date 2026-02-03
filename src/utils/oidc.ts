@@ -45,6 +45,23 @@ export async function logout(): Promise<void> {
 
 // 检查认证状态
 export async function isAuthenticated(): Promise<boolean> {
+  // 首先检查 localStorage 中的 user-info
+  const userInfoStr = localStorage.getItem("user-info");
+  if (userInfoStr) {
+    try {
+      const userInfo = JSON.parse(userInfoStr);
+      // 检查 token 是否过期
+      const now = Date.now();
+      const expires = userInfo.expires || 0;
+      if (expires > now && userInfo.accessToken) {
+        return true;
+      }
+    } catch (error) {
+      console.error("解析 user-info 失败:", error);
+    }
+  }
+
+  // 如果 user-info 不存在或过期，使用 OIDC 的 getUser
   const user = await getCurrentUser();
   return !!user && !user.expired;
 }

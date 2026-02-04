@@ -1,12 +1,12 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Page Navigation Tests", () => {
+test.describe("页面导航测试", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
   });
 
-  test("should navigate to lottery page", async ({ page }) => {
+  test("应该导航到彩票页面", async ({ page }) => {
     const lotteryLink = page.getByRole("link", { name: /彩票/ });
 
     if (await lotteryLink.isVisible()) {
@@ -17,7 +17,7 @@ test.describe("Page Navigation Tests", () => {
     }
   });
 
-  test("should navigate to bookkeeping page", async ({ page }) => {
+  test("应该导航到记账页面", async ({ page }) => {
     const bookkeepingLink = page.getByRole("link", { name: /记账/ });
 
     if (await bookkeepingLink.isVisible()) {
@@ -28,18 +28,18 @@ test.describe("Page Navigation Tests", () => {
     }
   });
 
-  test("should navigate to subscription page", async ({ page }) => {
+  test("应该导航到订阅页面", async ({ page }) => {
     const subscriptionLink = page.getByRole("link", { name: /订阅/ });
 
     if (await subscriptionLink.isVisible()) {
       await subscriptionLink.click();
-      await expect(page).toHaveURL(/.*subscription.*/);
+      await expect(page).toHaveURL(/.*download-subscription.*/);
     } else {
       test.skip();
     }
   });
 
-  test("should navigate to system page", async ({ page }) => {
+  test("应该导航到系统页面", async ({ page }) => {
     const systemLink = page.getByRole("link", { name: /系统/ });
 
     if (await systemLink.isVisible()) {
@@ -50,7 +50,7 @@ test.describe("Page Navigation Tests", () => {
     }
   });
 
-  test("should logout successfully", async ({ page }) => {
+  test("应该成功退出登录", async ({ page }) => {
     const logoutButton = page
       .getByRole("button", { name: /退出/ })
       .or(page.getByRole("menuitem", { name: /退出/ }));
@@ -65,8 +65,8 @@ test.describe("Page Navigation Tests", () => {
   });
 });
 
-test.describe("User Interface Tests", () => {
-  test("should display main content area", async ({ page }) => {
+test.describe("用户界面测试", () => {
+  test("应该显示主要内容区域", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -78,11 +78,8 @@ test.describe("User Interface Tests", () => {
   });
 });
 
-test.describe("API Response Tests", () => {
-  test("should successfully fetch application configuration", async ({
-    page
-  }) => {
-    // 监听网络请求
+test.describe("API 响应测试", () => {
+  test("应该成功获取应用配置", async ({ page }) => {
     const apiResponses: { url: string; status: number }[] = [];
 
     page.on("response", response => {
@@ -101,21 +98,19 @@ test.describe("API Response Tests", () => {
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(2000);
 
-    // 检查是否有成功的 API 响应
     const successResponses = apiResponses.filter(
       r => r.status >= 200 && r.status < 400
     );
 
     if (successResponses.length > 0) {
       console.log(
-        "API responses:",
+        "API 响应:",
         successResponses.map(r => `${r.url} - ${r.status}`)
       );
       expect(successResponses[0].status).toBeGreaterThanOrEqual(200);
       expect(successResponses[0].status).toBeLessThan(400);
     } else {
-      console.log("No API responses captured, checking page load");
-      // 至少页面应该成功加载
+      console.log("未捕获到 API 响应，检查页面加载");
       const currentUrl = page.url();
       expect(currentUrl).toContain("localhost:8848");
     }

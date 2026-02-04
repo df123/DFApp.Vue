@@ -1,15 +1,13 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Authentication Tests", () => {
-  test("should access protected page after authentication", async ({
-    page
-  }) => {
+test.describe("认证测试", () => {
+  test("应该访问受保护的页面", async ({ page }) => {
     await page.goto("/");
 
     await expect(page).toHaveTitle(/DFApp|首页/);
   });
 
-  test("should display user information", async ({ page }) => {
+  test("应该显示用户信息", async ({ page }) => {
     await page.goto("/");
 
     const userInfo = await page.evaluate(() => {
@@ -22,7 +20,7 @@ test.describe("Authentication Tests", () => {
     expect(userInfo.username).toBe("test");
   });
 
-  test("should navigate to lottery page", async ({ page }) => {
+  test("应该导航到彩票页面", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 

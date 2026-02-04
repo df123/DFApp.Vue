@@ -208,15 +208,102 @@ test.use({
 ```typescript
 import { test, expect } from "@playwright/test";
 
-test("测试描述", async ({ page }) => {
+test("测试描述（中文）", async ({ page }) => {
   // 1. 导航到页面
   await page.goto("/");
 
   // 2. 执行操作
   await page.click("button");
 
-  // 3. 验证结果
-  await expect(page).toHaveTitle(/预期标题/);
+  // 3. 验证结果（断言消息使用中文）
+  await expect(page)
+    .toHaveTitle(/预期标题/)
+    .toMatchSnapshot("快照名称");
+});
+```
+
+### 编写规范
+
+1. **测试描述**：
+   - 使用中文描述测试名称和预期行为
+   - 示例：`test("应该显示用户信息")` 而不是 `test("should display user information")`
+
+2. **测试分组**：
+   - `test.describe()` 使用中文描述
+   - 示例：`test.describe("认证测试")` 而不是 `test.describe("Authentication Tests")`
+
+3. **断言消息**：
+   - 所有断言消息应使用中文
+   - 示例：`expect(userInfo.username).toBe("test")` - 期望用户名为 test
+
+4. **日志输出**：
+   - 所有 `console.log()` 应使用中文
+   - 示例：`console.log("找到 5 个菜单链接")` 而不是 `console.log("Found 5 menu links")`
+
+5. **错误处理**：
+   - 错误信息使用中文
+   - 示例：`console.log("未找到用户元素，跳过测试")` 而不是 `console.log("User element not found, skipping")`
+
+6. **代码注释**：
+   - 注释使用中文描述
+   - 示例：`// 等待页面加载完成` 而不是 `// Wait for page to load`
+
+### 示例对比
+
+#### ✅ 推荐写法（中文）
+
+```typescript
+import { test, expect } from "@playwright/test";
+
+test.describe("认证测试", () => {
+  test("应该显示用户信息", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const userInfo = await page.evaluate(() => {
+      return JSON.parse(localStorage.getItem("user-info") || "{}");
+    });
+
+    expect(userInfo).not.toBeNull();
+    expect(userInfo.username).toBe("test");
+    console.log("用户信息:", userInfo);
+  });
+
+  test("应该导航到彩票页面", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const lotteryLink = page.getByRole("link", { name: /彩票/ });
+
+    if (await lotteryLink.isVisible()) {
+      await lotteryLink.click();
+      await expect(page).toHaveURL(/.*lottery.*/);
+      console.log("成功导航到彩票页面");
+    } else {
+      console.log("未找到彩票链接");
+    }
+  });
+});
+```
+
+#### ❌ 不推荐写法（英文）
+
+```typescript
+import { test, expect } from "@playwright/test";
+
+test.describe("Authentication Tests", () => {
+  test("should display user information", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const userInfo = await page.evaluate(() => {
+      return JSON.parse(localStorage.getItem("user-info") || "{}");
+    });
+
+    expect(userInfo).not.toBeNull();
+    expect(userInfo.username).toBe("test");
+    console.log("User info:", userInfo);
+  });
 });
 ```
 

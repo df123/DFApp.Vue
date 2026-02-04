@@ -1,16 +1,15 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Application E2E Tests", () => {
-  test("should load home page", async ({ page }) => {
+test.describe("端到端测试", () => {
+  test("应该加载首页", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
     const title = await page.title();
-    console.log("Page title:", title);
     expect(title).toBeDefined();
   });
 
-  test("should have user info in localStorage", async ({ page }) => {
+  test("应该在本地存储中有用户信息", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -24,7 +23,7 @@ test.describe("Application E2E Tests", () => {
     expect(userInfo.accessToken).toBeDefined();
   });
 
-  test("should navigate to different pages", async ({ page }) => {
+  test("应该导航到不同页面", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -33,12 +32,12 @@ test.describe("Application E2E Tests", () => {
       .filter({ hasText: /(首页|彩票|记账|订阅|系统)/ });
 
     const count = await menuLinks.count();
-    console.log(`Found ${count} menu links`);
+    console.log(`找到 ${count} 个菜单链接`);
 
     if (count > 0) {
       await menuLinks.first().click();
       await page.waitForTimeout(1000);
-      console.log("Clicked menu link, URL:", page.url());
+      console.log("点击菜单链接后，URL:", page.url());
     }
     // 不再跳过测试，让它自然地处理结果
   });
@@ -56,7 +55,7 @@ test.describe("Application E2E Tests", () => {
     if ((await userElement.count()) > 0) {
       await expect(userElement).toBeVisible({ timeout: 5000 });
     } else {
-      console.log("User element not found, skipping");
+      console.log("未找到用户元素，跳过测试");
       test.skip();
     }
   });

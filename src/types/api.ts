@@ -143,3 +143,141 @@ export interface MonthlyExpenditureDto {
   selfAverage: number;
   nonSelfAverage: number;
 }
+
+// 电动车类型
+export interface ElectricVehicleDto {
+  id: string;
+  name: string;
+  brand?: string;
+  model?: string;
+  licensePlate?: string;
+  purchaseDate?: string;
+  batteryCapacity?: number;
+  totalMileage: number;
+  remark?: string;
+  creationTime: string;
+  lastModificationTime?: string;
+}
+
+export interface CreateUpdateElectricVehicleDto {
+  name: string;
+  brand?: string;
+  model?: string;
+  licensePlate?: string;
+  purchaseDate?: string;
+  batteryCapacity?: number;
+  totalMileage: number;
+  remark?: string;
+}
+
+export interface ElectricVehicleCostDto {
+  id: string;
+  vehicleId: string;
+  costType: CostType;
+  costDate: string;
+  amount: number;
+  isBelongToSelf: boolean;
+  remark?: string;
+  vehicle?: ElectricVehicleDto;
+  creationTime: string;
+  lastModificationTime?: string;
+}
+
+export interface CreateUpdateElectricVehicleCostDto {
+  vehicleId: string;
+  costType: CostType;
+  costDate: string;
+  amount: number;
+  isBelongToSelf: boolean;
+  remark?: string;
+}
+
+export interface ElectricVehicleChargingRecordDto {
+  id: string;
+  vehicleId: string;
+  chargingDate: string;
+  stationName?: string;
+  chargingDuration?: number;
+  energy?: number;
+  amount: number;
+  startSOC?: number;
+  endSOC?: number;
+  isBelongToSelf: boolean;
+  remark?: string;
+  vehicle?: ElectricVehicleDto;
+  creationTime: string;
+  lastModificationTime?: string;
+}
+
+export interface CreateUpdateElectricVehicleChargingRecordDto {
+  vehicleId: string;
+  chargingDate: string;
+  stationName?: string;
+  chargingDuration?: number;
+  energy?: number;
+  amount: number;
+  startSOC?: number;
+  endSOC?: number;
+  isBelongToSelf: boolean;
+  remark?: string;
+}
+
+export interface GasolinePriceDto {
+  id: string;
+  province: string;
+  date: string;
+  price0H?: number;
+  price89H?: number;
+  price90H?: number;
+  price92H?: number;
+  price93H?: number;
+  price95H?: number;
+  price97H?: number;
+  price98H?: number;
+  creationTime: string;
+}
+
+export interface OilCostComparisonDto {
+  electricVehicleTotalCost: number;
+  electricVehicleMileage: number;
+  electricVehicleCostPerKm: number;
+  electricChargingCost: number;
+  electricOtherCost: number;
+  oilVehicleCostPerKm: number;
+  oilVehicleTotalCost: number;
+  oilVehicleFuelCost: number;
+  savings: number;
+  savingsPercentage: number;
+  province: string;
+  currentGasolinePrice: number;
+  gasolineGrade: GasolineGrade;
+  fuelConsumption: number;
+  startDate: string;
+  endDate: string;
+}
+
+export interface OilCostComparisonRequestDto {
+  vehicleId: string;
+  oilVehicleMileage: number;
+  oilVehicleFuelConsumption: number;
+  oilVehicleGasolineGrade: number;
+}
+
+export interface RefreshGasolinePriceDto {
+  province: string;
+}
+
+export enum CostType {
+  Charging = 1,
+  Maintenance = 2,
+  Insurance = 3,
+  Parking = 4,
+  Repair = 5,
+  Other = 6
+}
+
+export enum GasolineGrade {
+  H92 = 92,
+  H95 = 95,
+  H98 = 98
+}

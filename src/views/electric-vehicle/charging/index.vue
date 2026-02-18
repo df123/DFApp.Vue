@@ -14,7 +14,7 @@
       <el-table :data="tableData" :loading="loading" stripe border>
         <el-table-column prop="chargingDate" label="日期" width="120">
           <template #default="{ row }">
-            {{ row.chargingDate ? row.chargingDate : "-" }}
+            {{ row.chargingDate || "-" }}
           </template>
         </el-table-column>
         <el-table-column prop="amount" label="金额" width="100">
@@ -27,30 +27,8 @@
             {{ row.energy ? row.energy.toFixed(1) + " kWh" : "-" }}
           </template>
         </el-table-column>
-        <el-table-column prop="stationName" label="充电站" width="150" />
-        <el-table-column prop="chargingDuration" label="时长" width="100">
-          <template #default="{ row }">
-            {{ row.chargingDuration ? row.chargingDuration + " 分钟" : "-" }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="startSOC" label="起始电量" width="100">
-          <template #default="{ row }">
-            {{ row.startSOC ? row.startSOC + "%" : "-" }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="endSOC" label="结束电量" width="100">
-          <template #default="{ row }">
-            {{ row.endSOC ? row.endSOC + "%" : "-" }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="isBelongToSelf" label="归属" width="100">
-          <template #default="{ row }">
-            {{ row.isBelongToSelf ? "个人" : "家庭" }}
-          </template>
-        </el-table-column>
         <el-table-column prop="vehicle.name" label="车辆" width="120" />
-        <el-table-column prop="remark" label="备注" show-overflow-tooltip />
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button
               size="small"
@@ -87,7 +65,7 @@
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
-      width="700px"
+      width="600px"
       :before-close="handleClose"
     >
       <el-form
@@ -102,20 +80,6 @@
             type="date"
             placeholder="请选择日期"
             value-format="YYYY-MM-DD"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="充电站" prop="stationName">
-          <el-input
-            v-model="formData.stationName"
-            placeholder="请输入充电站名称"
-          />
-        </el-form-item>
-        <el-form-item label="充电时长(分钟)" prop="chargingDuration">
-          <el-input-number
-            v-model="formData.chargingDuration"
-            :min="0"
-            placeholder="请输入充电时长"
             style="width: 100%"
           />
         </el-form-item>
@@ -138,30 +102,6 @@
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="起始电量(%)" prop="startSOC">
-          <el-input-number
-            v-model="formData.startSOC"
-            :min="0"
-            :max="100"
-            placeholder="请输入起始电量"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="结束电量(%)" prop="endSOC">
-          <el-input-number
-            v-model="formData.endSOC"
-            :min="0"
-            :max="100"
-            placeholder="请输入结束电量"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="归属" prop="isBelongToSelf">
-          <el-radio-group v-model="formData.isBelongToSelf">
-            <el-radio :label="true">个人</el-radio>
-            <el-radio :label="false">家庭</el-radio>
-          </el-radio-group>
-        </el-form-item>
         <el-form-item label="车辆" prop="vehicleId">
           <el-select
             v-model="formData.vehicleId"
@@ -175,14 +115,6 @@
               :value="vehicle.id"
             />
           </el-select>
-        </el-form-item>
-        <el-form-item label="备注">
-          <el-input
-            v-model="formData.remark"
-            type="textarea"
-            :rows="2"
-            placeholder="请输入备注"
-          />
         </el-form-item>
       </el-form>
       <template #footer>

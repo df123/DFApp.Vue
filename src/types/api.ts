@@ -196,14 +196,8 @@ export interface ElectricVehicleChargingRecordDto {
   id: string;
   vehicleId: string;
   chargingDate: string;
-  stationName?: string;
-  chargingDuration?: number;
   energy?: number;
   amount: number;
-  startSOC?: number;
-  endSOC?: number;
-  isBelongToSelf: boolean;
-  remark?: string;
   vehicle?: ElectricVehicleDto;
   creationTime: string;
   lastModificationTime?: string;
@@ -212,14 +206,8 @@ export interface ElectricVehicleChargingRecordDto {
 export interface CreateUpdateElectricVehicleChargingRecordDto {
   vehicleId: string;
   chargingDate: string;
-  stationName?: string;
-  chargingDuration?: number;
   energy?: number;
   amount: number;
-  startSOC?: number;
-  endSOC?: number;
-  isBelongToSelf: boolean;
-  remark?: string;
 }
 
 export interface GasolinePriceDto {

@@ -33,10 +33,15 @@
           </template>
         </el-table-column>
         <el-table-column prop="vehicle.name" label="车辆" width="120" />
-        <el-table-column prop="remark" label="备注" show-overflow-tooltip />
+        <el-table-column prop="remark" label="备注" show-overflow-tooltip>
+          <template #default="{ row }">
+            {{ formatRemark(row.remark) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button
+              v-if="row.costType !== 1"
               size="small"
               type="primary"
               link
@@ -45,6 +50,7 @@
               编辑
             </el-button>
             <el-button
+              v-if="row.costType !== 1"
               size="small"
               type="danger"
               link
@@ -52,6 +58,9 @@
             >
               删除
             </el-button>
+            <el-text v-if="row.costType === 1" type="info" size="small">
+              自动同步
+            </el-text>
           </template>
         </el-table-column>
       </el-table>
@@ -109,7 +118,6 @@
             placeholder="请选择类型"
             style="width: 100%"
           >
-            <el-option label="充电" :value="1" />
             <el-option label="保养" :value="2" />
             <el-option label="保险" :value="3" />
             <el-option label="停车" :value="4" />
@@ -187,7 +195,7 @@ const formData = ref<CreateUpdateElectricVehicleCostDto>({
   costDate: "",
   amount: 0,
   isBelongToSelf: true,
-  costType: 1,
+  costType: 2,
   vehicleId: "",
   remark: ""
 });
@@ -219,6 +227,17 @@ const getCostTypeName = (type: number) => {
     6: "其他"
   };
   return map[type] || "未知";
+};
+
+const formatRemark = (remark: string | undefined) => {
+  if (!remark) return "-";
+  if (remark.startsWith("ChargingRecord:")) {
+    const parts = remark.split("|");
+    if (parts.length > 1) {
+      return parts[1];
+    }
+  }
+  return remark;
 };
 
 const loadVehicles = async () => {
@@ -267,7 +286,7 @@ const handleCreate = () => {
     costDate: new Date().toISOString().split("T")[0],
     amount: 0,
     isBelongToSelf: true,
-    costType: 1,
+    costType: 2,
     vehicleId: undefined,
     remark: ""
   });
@@ -276,6 +295,11 @@ const handleCreate = () => {
 };
 
 const handleEdit = (row: ElectricVehicleCostDto) => {
+  if (row.costType === 1) {
+    ElMessage.warning("充电类型的成本记录不能直接编辑，请通过充电记录进行管理");
+    return;
+  }
+
   currentEditId.value = row.id;
   Object.assign(formData.value, {
     costDate: row.costDate,
@@ -291,6 +315,13 @@ const handleEdit = (row: ElectricVehicleCostDto) => {
 
 const handleDelete = async (row: ElectricVehicleCostDto) => {
   try {
+    if (row.costType === 1) {
+      ElMessage.warning(
+        "充电类型的成本记录不能直接删除，请通过充电记录进行管理"
+      );
+      return;
+    }
+
     await ElMessageBox.confirm(`确定要删除成本记录吗？`, "删除确认", {
       confirmButtonText: "确定",
       cancelButtonText: "取消",

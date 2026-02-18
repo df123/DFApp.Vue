@@ -27,6 +27,13 @@
             {{ row.energy ? row.energy.toFixed(1) + " kWh" : "-" }}
           </template>
         </el-table-column>
+        <el-table-column prop="currentMileage" label="当前里程" width="120">
+          <template #default="{ row }">
+            {{
+              row.currentMileage ? row.currentMileage.toFixed(1) + " km" : "-"
+            }}
+          </template>
+        </el-table-column>
         <el-table-column prop="vehicle.name" label="车辆" width="120" />
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
@@ -102,6 +109,16 @@
             style="width: 100%"
           />
         </el-form-item>
+        <el-form-item label="当前总里程" prop="currentMileage">
+          <el-input-number
+            v-model="formData.currentMileage"
+            :min="0"
+            :precision="1"
+            placeholder="请输入当前总里程"
+            style="width: 100%"
+          />
+          <span style="margin-left: 10px">km</span>
+        </el-form-item>
         <el-form-item label="车辆" prop="vehicleId">
           <el-select
             v-model="formData.vehicleId"
@@ -166,6 +183,7 @@ const formData = ref<CreateUpdateElectricVehicleChargingRecordDto>({
   chargingDuration: undefined,
   energy: undefined,
   amount: 0,
+  currentMileage: undefined,
   startSOC: undefined,
   endSOC: undefined,
   isBelongToSelf: true,
@@ -234,6 +252,7 @@ const handleCreate = () => {
     chargingDuration: undefined,
     energy: undefined,
     amount: 0,
+    currentMileage: undefined,
     startSOC: undefined,
     endSOC: undefined,
     isBelongToSelf: true,
@@ -252,6 +271,7 @@ const handleEdit = (row: ElectricVehicleChargingRecordDto) => {
     chargingDuration: row.chargingDuration,
     energy: row.energy,
     amount: row.amount,
+    currentMileage: row.currentMileage,
     startSOC: row.startSOC,
     endSOC: row.endSOC,
     isBelongToSelf: row.isBelongToSelf,

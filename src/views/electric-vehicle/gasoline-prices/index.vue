@@ -198,6 +198,11 @@ const loadPrices = async () => {
       params.province = filterForm.value.province;
     }
 
+    if (dateRange.value && dateRange.value.length === 2) {
+      params.startDate = dateRange.value[0].toISOString();
+      params.endDate = dateRange.value[1].toISOString();
+    }
+
     const result = await gasolinePriceApi.getPrices(params);
     priceList.value = result.items || [];
     total.value = result.totalCount || 0;
@@ -215,10 +220,9 @@ const handleSearch = () => {
 };
 
 const handleRefresh = async () => {
-  const province = filterForm.value.province || "山东";
   refreshing.value = true;
   try {
-    await gasolinePriceApi.refreshPrices(province);
+    await gasolinePriceApi.refreshPrices();
     ElMessage.success("油价刷新成功");
     loadPrices();
   } catch (error) {

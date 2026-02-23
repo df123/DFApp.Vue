@@ -127,10 +127,8 @@ class GasolinePriceApi {
     return http.get(`${this.baseUrl}/latest-price`, { params: { province } });
   }
 
-  async refreshPrices(province: string): Promise<void> {
-    return http.post(`${this.baseUrl}/refresh-gasoline-prices`, {
-      data: { province }
-    });
+  async refreshPrices(): Promise<void> {
+    return http.post(`${this.baseUrl}/refresh-gasoline-prices`);
   }
 }
 

@@ -174,7 +174,7 @@ const handleSave = async () => {
 const handleRefreshPrice = async () => {
   refreshing.value = true;
   try {
-    await gasolinePriceApi.refreshPrices(configForm.value.province);
+    await gasolinePriceApi.refreshPrices();
     ElMessage.success("油价刷新成功");
   } catch (error) {
     console.error("刷新油价失败:", error);

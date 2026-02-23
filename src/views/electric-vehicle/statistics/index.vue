@@ -124,8 +124,11 @@
         <el-descriptions-item label="百公里油耗">
           {{ data?.fuelConsumption }}升
         </el-descriptions-item>
-        <el-descriptions-item label="当前油价">
+        <el-descriptions-item label="最新油价（参考）">
           ￥{{ data?.currentGasolinePrice?.toFixed(2) }}/升
+        </el-descriptions-item>
+        <el-descriptions-item label="计算说明" :span="3">
+          油车费用根据充电日期对应的实际油价计算，而非使用单一最新油价
         </el-descriptions-item>
       </el-descriptions>
 

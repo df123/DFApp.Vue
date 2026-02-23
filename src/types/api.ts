@@ -251,10 +251,6 @@ export interface OilCostComparisonRequestDto {
   oilVehicleGasolineGrade: number;
 }
 
-export interface RefreshGasolinePriceDto {
-  province: string;
-}
-
 export enum CostType {
   Charging = 1,
   Maintenance = 2,

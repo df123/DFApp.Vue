@@ -7,6 +7,31 @@
         </div>
       </template>
 
+      <el-row :gutter="20" style="margin-bottom: 20px">
+        <el-col :span="12">
+          <el-radio-group v-model="timeRange" @change="handleTimeRangeChange">
+            <el-radio-button label="all">全部时间</el-radio-button>
+            <el-radio-button label="30">最近30天</el-radio-button>
+            <el-radio-button label="90">最近90天</el-radio-button>
+            <el-radio-button label="365">最近一年</el-radio-button>
+            <el-radio-button label="custom">自定义</el-radio-button>
+          </el-radio-group>
+        </el-col>
+        <el-col :span="12">
+          <el-date-picker
+            v-if="timeRange === 'custom'"
+            v-model="customDateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="YYYY-MM-DD"
+            style="width: 100%"
+            @change="handleCustomDateChange"
+          />
+        </el-col>
+      </el-row>
+
       <el-row :gutter="20">
         <el-col :span="6">
           <el-card class="stat-card">
@@ -142,13 +167,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, watch, onMounted, onUnmounted, nextTick } from "vue";
 import { electricVehicleCostApi } from "@/api/electric-vehicle";
 import type { OilCostComparisonDto } from "@/types/api";
 import * as echarts from "echarts";
 
 const data = ref<OilCostComparisonDto | null>(null);
 const loading = ref(false);
+const timeRange = ref("30");
+const customDateRange = ref<[string, string] | null>(null);
 
 const comparisonChartRef = ref<HTMLElement | null>(null);
 const costBreakdownChartRef = ref<HTMLElement | null>(null);
@@ -159,13 +186,56 @@ const today = new Date();
 const thirtyDaysAgo = new Date(today);
 thirtyDaysAgo.setDate(today.getDate() - 30);
 
+const getDateRange = () => {
+  const now = new Date();
+  let startDate: Date;
+
+  if (timeRange.value === "all") {
+    startDate = new Date("2000-01-01");
+  } else if (timeRange.value === "30") {
+    startDate = new Date(now);
+    startDate.setDate(now.getDate() - 30);
+  } else if (timeRange.value === "90") {
+    startDate = new Date(now);
+    startDate.setDate(now.getDate() - 90);
+  } else if (timeRange.value === "365") {
+    startDate = new Date(now);
+    startDate.setDate(now.getDate() - 365);
+  } else if (timeRange.value === "custom" && customDateRange.value) {
+    return {
+      startDate: customDateRange.value[0],
+      endDate: customDateRange.value[1]
+    };
+  } else {
+    startDate = thirtyDaysAgo;
+  }
+
+  return {
+    startDate: startDate.toISOString().split("T")[0],
+    endDate: now.toISOString().split("T")[0]
+  };
+};
+
+const handleTimeRangeChange = () => {
+  loadData();
+};
+
+const handleCustomDateChange = () => {
+  if (customDateRange.value) {
+    loadData();
+  }
+};
+
 const loadData = async () => {
   loading.value = true;
   try {
+    const { startDate, endDate } = getDateRange();
     data.value = await electricVehicleCostApi.getOilCostComparison({
-      startDate: thirtyDaysAgo.toISOString().split("T")[0],
-      endDate: today.toISOString().split("T")[0]
+      startDate,
+      endDate
     });
+    await nextTick();
+    updateCharts();
   } catch (error) {
     console.error("加载对比数据失败:", error);
   } finally {
@@ -173,13 +243,13 @@ const loadData = async () => {
   }
 };
 
-const initCharts = () => {
+const updateCharts = () => {
   if (!data.value) return;
 
-  if (comparisonChartRef.value) {
+  if (comparisonChartRef.value && !comparisonChartInstance) {
     comparisonChartInstance = echarts.init(comparisonChartRef.value);
   }
-  if (costBreakdownChartRef.value) {
+  if (costBreakdownChartRef.value && !costBreakdownChartInstance) {
     costBreakdownChartInstance = echarts.init(costBreakdownChartRef.value);
   }
 
@@ -277,14 +347,21 @@ const initCharts = () => {
   };
 
   if (comparisonChartInstance) {
-    comparisonChartInstance.setOption(comparisonOption);
+    comparisonChartInstance.setOption(comparisonOption, true);
   }
   if (costBreakdownChartInstance) {
-    costBreakdownChartInstance.setOption(breakdownOption);
+    costBreakdownChartInstance.setOption(breakdownOption, true);
   }
-
-  window.addEventListener("resize", handleResize);
 };
+
+watch(
+  () => data.value,
+  () => {
+    if (data.value) {
+      updateCharts();
+    }
+  }
+);
 
 const handleResize = () => {
   comparisonChartInstance?.resize();
@@ -292,10 +369,8 @@ const handleResize = () => {
 };
 
 onMounted(() => {
+  window.addEventListener("resize", handleResize);
   loadData();
-  setTimeout(() => {
-    initCharts();
-  }, 500);
 });
 
 onUnmounted(() => {

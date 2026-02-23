@@ -24,7 +24,7 @@
         </el-table-column>
         <el-table-column prop="energy" label="电量" width="100">
           <template #default="{ row }">
-            {{ row.energy ? row.energy.toFixed(1) + " kWh" : "-" }}
+            {{ row.energy ? row.energy.toFixed(4) + " kWh" : "-" }}
           </template>
         </el-table-column>
         <el-table-column prop="currentMileage" label="当前里程" width="120">
@@ -94,7 +94,7 @@
           <el-input-number
             v-model="formData.energy"
             :min="0"
-            :precision="1"
+            :precision="4"
             placeholder="请输入电量"
             style="width: 100%"
           />

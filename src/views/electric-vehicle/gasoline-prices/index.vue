@@ -22,6 +22,7 @@
               v-model="filterForm.province"
               placeholder="请选择省份"
               clearable
+              style="width: 200px"
               @change="handleSearch"
             >
               <el-option label="全部" value="" />
@@ -59,8 +60,8 @@
         border
         style="width: 100%"
       >
-        <el-table-column prop="province" label="省份" width="120" />
-        <el-table-column prop="date" label="日期" width="120">
+        <el-table-column prop="province" label="省份" min-width="100" />
+        <el-table-column prop="date" label="日期" min-width="120">
           <template #default="{ row }">
             {{ formatDate(row.date) }}
           </template>
@@ -68,7 +69,7 @@
         <el-table-column
           prop="price0H"
           label="0号柴油"
-          width="110"
+          min-width="110"
           align="right"
         >
           <template #default="{ row }">
@@ -78,7 +79,7 @@
         <el-table-column
           prop="price89H"
           label="89号汽油"
-          width="110"
+          min-width="110"
           align="right"
         >
           <template #default="{ row }">
@@ -88,7 +89,7 @@
         <el-table-column
           prop="price90H"
           label="90号汽油"
-          width="110"
+          min-width="110"
           align="right"
         >
           <template #default="{ row }">
@@ -98,7 +99,7 @@
         <el-table-column
           prop="price92H"
           label="92号汽油"
-          width="110"
+          min-width="110"
           align="right"
         >
           <template #default="{ row }">
@@ -108,7 +109,7 @@
         <el-table-column
           prop="price93H"
           label="93号汽油"
-          width="110"
+          min-width="110"
           align="right"
         >
           <template #default="{ row }">
@@ -118,7 +119,7 @@
         <el-table-column
           prop="price95H"
           label="95号汽油"
-          width="110"
+          min-width="110"
           align="right"
         >
           <template #default="{ row }">
@@ -128,7 +129,7 @@
         <el-table-column
           prop="price97H"
           label="97号汽油"
-          width="110"
+          min-width="110"
           align="right"
         >
           <template #default="{ row }">
@@ -138,14 +139,14 @@
         <el-table-column
           prop="price98H"
           label="98号汽油"
-          width="110"
+          min-width="110"
           align="right"
         >
           <template #default="{ row }">
             {{ formatPrice(row.price98H) }}
           </template>
         </el-table-column>
-        <el-table-column prop="creationTime" label="创建时间" width="180">
+        <el-table-column prop="creationTime" label="创建时间" min-width="180">
           <template #default="{ row }">
             {{ formatDateTime(row.creationTime) }}
           </template>

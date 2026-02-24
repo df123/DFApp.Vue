@@ -55,7 +55,7 @@
           <el-card class="stat-card">
             <el-statistic
               title="电车每公里成本"
-              :value="data?.electricVehicleCostPerKm?.toFixed(3)"
+              :value="data?.electricVehicleCostPerKm?.toFixed(2)"
               prefix="￥"
             />
           </el-card>
@@ -96,6 +96,22 @@
         </el-col>
       </el-row>
 
+      <el-divider>电费油费对比</el-divider>
+
+      <el-row :gutter="20">
+        <el-col :span="24">
+          <el-card>
+            <template #header>
+              <span class="card-title">电费油费对比</span>
+            </template>
+            <div
+              ref="fuelCostComparisonChartRef"
+              style="width: 100%; height: 400px"
+            />
+          </el-card>
+        </el-col>
+      </el-row>
+
       <el-divider>油电对比分析</el-divider>
 
       <el-row :gutter="20">
@@ -112,7 +128,7 @@
                 ￥{{ data?.electricOtherCost?.toFixed(2) }}
               </el-descriptions-item>
               <el-descriptions-item label="每公里成本">
-                ￥{{ data?.electricVehicleCostPerKm?.toFixed(3) }}
+                ￥{{ data?.electricVehicleCostPerKm?.toFixed(2) }}
               </el-descriptions-item>
             </el-descriptions>
           </el-card>
@@ -179,8 +195,10 @@ const customDateRange = ref<[string, string] | null>(null);
 
 const comparisonChartRef = ref<HTMLElement | null>(null);
 const costBreakdownChartRef = ref<HTMLElement | null>(null);
+const fuelCostComparisonChartRef = ref<HTMLElement | null>(null);
 let comparisonChartInstance: echarts.ECharts | null = null;
 let costBreakdownChartInstance: echarts.ECharts | null = null;
+let fuelCostComparisonChartInstance: echarts.ECharts | null = null;
 
 const today = new Date();
 const thirtyDaysAgo = new Date(today);
@@ -252,6 +270,11 @@ const updateCharts = () => {
   if (costBreakdownChartRef.value && !costBreakdownChartInstance) {
     costBreakdownChartInstance = echarts.init(costBreakdownChartRef.value);
   }
+  if (fuelCostComparisonChartRef.value && !fuelCostComparisonChartInstance) {
+    fuelCostComparisonChartInstance = echarts.init(
+      fuelCostComparisonChartRef.value
+    );
+  }
 
   const comparisonOption = {
     tooltip: {
@@ -261,7 +284,7 @@ const updateCharts = () => {
       }
     },
     legend: {
-      data: ["电车", "油车"]
+      data: ["电车总成本", "油车总成本", "电车每公里成本", "油车每公里成本"]
     },
     grid: {
       left: "3%",
@@ -273,32 +296,60 @@ const updateCharts = () => {
       type: "category",
       data: ["总成本", "每公里成本"]
     },
-    yAxis: {
-      type: "value",
-      name: "成本（元）"
-    },
-    series: [
+    yAxis: [
       {
-        name: "电车",
-        type: "bar",
-        data: [
-          data.value.electricVehicleTotalCost || 0,
-          data.value.electricVehicleCostPerKm || 0
-        ],
-        itemStyle: {
-          color: "#67C23A"
+        type: "value",
+        name: "总成本（元）",
+        position: "left",
+        axisLabel: {
+          formatter: "{value} 元"
         }
       },
       {
-        name: "油车",
+        type: "value",
+        name: "每公里成本（元）",
+        position: "right",
+        axisLabel: {
+          formatter: "{value} 元"
+        }
+      }
+    ],
+    series: [
+      {
+        name: "电车总成本",
         type: "bar",
-        data: [
-          data.value.oilVehicleTotalCost || 0,
-          data.value.oilVehicleCostPerKm || 0
-        ],
+        data: [data.value.electricVehicleTotalCost || 0, null],
+        itemStyle: {
+          color: "#67C23A"
+        },
+        yAxisIndex: 0
+      },
+      {
+        name: "油车总成本",
+        type: "bar",
+        data: [data.value.oilVehicleTotalCost || 0, null],
         itemStyle: {
           color: "#F56C6C"
-        }
+        },
+        yAxisIndex: 0
+      },
+      {
+        name: "电车每公里成本",
+        type: "bar",
+        data: [null, (data.value.electricVehicleCostPerKm || 0).toFixed(2)],
+        itemStyle: {
+          color: "#95D475"
+        },
+        yAxisIndex: 1
+      },
+      {
+        name: "油车每公里成本",
+        type: "bar",
+        data: [null, (data.value.oilVehicleCostPerKm || 0).toFixed(2)],
+        itemStyle: {
+          color: "#F89898"
+        },
+        yAxisIndex: 1
       }
     ]
   };
@@ -346,11 +397,132 @@ const updateCharts = () => {
     ]
   };
 
+  const fuelCostComparisonOption = {
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow"
+      }
+    },
+    legend: {
+      data: ["电费总费用", "油费总费用", "电费每公里成本", "油费每公里成本"]
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      containLabel: true
+    },
+    xAxis: {
+      type: "category",
+      data: ["总费用", "每公里成本"]
+    },
+    yAxis: [
+      {
+        type: "value",
+        name: "总费用（元）",
+        position: "left",
+        axisLabel: {
+          formatter: "{value} 元"
+        }
+      },
+      {
+        type: "value",
+        name: "每公里成本（元）",
+        position: "right",
+        axisLabel: {
+          formatter: "{value} 元"
+        }
+      }
+    ],
+    series: [
+      {
+        name: "电费总费用",
+        type: "bar",
+        data: [data.value.electricChargingCost || 0, null],
+        itemStyle: {
+          color: "#91CC75"
+        },
+        label: {
+          show: true,
+          position: "top",
+          formatter: (params: any) => {
+            return params.value ? `${params.value.toFixed(2)} 元` : "";
+          }
+        },
+        yAxisIndex: 0
+      },
+      {
+        name: "油费总费用",
+        type: "bar",
+        data: [data.value.oilVehicleFuelCost || 0, null],
+        itemStyle: {
+          color: "#F56C6C"
+        },
+        label: {
+          show: true,
+          position: "top",
+          formatter: (params: any) => {
+            return params.value ? `${params.value.toFixed(2)} 元` : "";
+          }
+        },
+        yAxisIndex: 0
+      },
+      {
+        name: "电费每公里成本",
+        type: "bar",
+        data: [
+          null,
+          (
+            (data.value.electricChargingCost || 0) /
+            (data.value.electricVehicleMileage || 1)
+          ).toFixed(2)
+        ],
+        itemStyle: {
+          color: "#B3E19D"
+        },
+        label: {
+          show: true,
+          position: "top",
+          formatter: (params: any) => {
+            return params.value ? `${params.value} 元` : "";
+          }
+        },
+        yAxisIndex: 1
+      },
+      {
+        name: "油费每公里成本",
+        type: "bar",
+        data: [
+          null,
+          (
+            (data.value.oilVehicleFuelCost || 0) /
+            (data.value.electricVehicleMileage || 1)
+          ).toFixed(2)
+        ],
+        itemStyle: {
+          color: "#F89898"
+        },
+        label: {
+          show: true,
+          position: "top",
+          formatter: (params: any) => {
+            return params.value ? `${params.value} 元` : "";
+          }
+        },
+        yAxisIndex: 1
+      }
+    ]
+  };
+
   if (comparisonChartInstance) {
     comparisonChartInstance.setOption(comparisonOption, true);
   }
   if (costBreakdownChartInstance) {
     costBreakdownChartInstance.setOption(breakdownOption, true);
+  }
+  if (fuelCostComparisonChartInstance) {
+    fuelCostComparisonChartInstance.setOption(fuelCostComparisonOption, true);
   }
 };
 
@@ -366,6 +538,7 @@ watch(
 const handleResize = () => {
   comparisonChartInstance?.resize();
   costBreakdownChartInstance?.resize();
+  fuelCostComparisonChartInstance?.resize();
 };
 
 onMounted(() => {
@@ -377,6 +550,7 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
   comparisonChartInstance?.dispose();
   costBreakdownChartInstance?.dispose();
+  fuelCostComparisonChartInstance?.dispose();
 });
 </script>
 

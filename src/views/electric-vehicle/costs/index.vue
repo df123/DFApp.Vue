@@ -14,7 +14,7 @@
       <el-table :data="tableData" :loading="loading" stripe border>
         <el-table-column prop="costDate" label="日期" width="120">
           <template #default="{ row }">
-            {{ row.costDate ? row.costDate : "-" }}
+            {{ row.costDate ? row.costDate.split("T")[0] : "-" }}
           </template>
         </el-table-column>
         <el-table-column prop="amount" label="金额" width="120">
@@ -287,7 +287,7 @@ const handleCreate = () => {
     amount: 0,
     isBelongToSelf: true,
     costType: 2,
-    vehicleId: undefined,
+    vehicleId: vehicles.value.length === 1 ? vehicles.value[0].id : undefined,
     remark: ""
   });
   dialogTitle.value = "新增成本";

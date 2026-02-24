@@ -14,27 +14,27 @@
       <el-table :data="tableData" :loading="loading" stripe border>
         <el-table-column prop="chargingDate" label="日期" width="120">
           <template #default="{ row }">
-            {{ row.chargingDate || "-" }}
+            {{ row.chargingDate ? row.chargingDate.split("T")[0] : "-" }}
           </template>
         </el-table-column>
-        <el-table-column prop="amount" label="金额" width="100">
+        <el-table-column prop="amount" label="金额" width="140">
           <template #default="{ row }">
             ￥{{ row.amount.toFixed(2) }}
           </template>
         </el-table-column>
-        <el-table-column prop="energy" label="电量" width="100">
+        <el-table-column prop="energy" label="电量" width="140">
           <template #default="{ row }">
             {{ row.energy ? row.energy.toFixed(4) + " kWh" : "-" }}
           </template>
         </el-table-column>
-        <el-table-column prop="currentMileage" label="当前里程" width="120">
+        <el-table-column prop="currentMileage" label="当前里程" width="160">
           <template #default="{ row }">
             {{
               row.currentMileage ? row.currentMileage.toFixed(1) + " km" : "-"
             }}
           </template>
         </el-table-column>
-        <el-table-column prop="vehicle.name" label="车辆" width="120" />
+        <el-table-column prop="vehicle.name" label="车辆" min-width="120" />
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -256,7 +256,7 @@ const handleCreate = () => {
     startSOC: undefined,
     endSOC: undefined,
     isBelongToSelf: true,
-    vehicleId: undefined,
+    vehicleId: vehicles.value.length === 1 ? vehicles.value[0].id : undefined,
     remark: ""
   });
   dialogTitle.value = "新增充电记录";

@@ -516,7 +516,8 @@ const loadTableData = async () => {
       maxResultCount: pagination.pageSize,
       filter: searchForm.filter || undefined,
       categoryId: searchForm.categoryId,
-      isBelongToSelf: searchForm.isBelongToSelf
+      isBelongToSelf: searchForm.isBelongToSelf,
+      sorting: "ExpenditureDate DESC"
     };
 
     const result = await expenditureApi.getExpenditures(params);

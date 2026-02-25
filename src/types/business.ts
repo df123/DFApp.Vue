@@ -864,6 +864,7 @@ export interface RssSubscriptionDownloadDto {
   aria2Gid: string;
   downloadStatus: number;
   downloadStatusText?: string;
+  isPendingDueToLowDiskSpace: boolean;
   errorMessage?: string;
   downloadStartTime?: string;
   downloadCompleteTime?: string;

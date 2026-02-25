@@ -441,6 +441,41 @@ const handleSearch = () => {
   fetchData();
 };
 
+const handleReset = () => {
+  searchForm.filter = "";
+  searchForm.rssSourceId = undefined;
+  searchForm.isEnabled = undefined;
+  pagination.page = 1;
+  fetchData();
+};
+
+const handleCreate = () => {
+  isEdit.value = false;
+  currentEditId = null;
+  Object.assign(formData, {
+    name: "",
+    keywords: "",
+    isEnabled: true,
+    minSeeders: undefined,
+    maxSeeders: undefined,
+    minLeechers: undefined,
+    maxLeechers: undefined,
+    minDownloads: undefined,
+    maxDownloads: undefined,
+    qualityFilter: undefined,
+    subtitleGroupFilter: undefined,
+    autoDownload: true,
+    videoOnly: false,
+    enableKeywordFilter: false,
+    savePath: undefined,
+    rssSourceId: undefined,
+    startDate: undefined,
+    endDate: undefined,
+    remark: undefined
+  });
+  showDialog.value = true;
+};
+
 const handleEdit = (row: RssSubscriptionDto) => {
   isEdit.value = true;
   currentEditId = row.id;

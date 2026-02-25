@@ -96,10 +96,22 @@
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column label="下载状态" width="100">
+        <el-table-column label="下载状态" width="120">
           <template #default="{ row }">
-            <el-tag :type="getStatusType(row.downloadStatus)">
-              {{ getStatusText(row.downloadStatus) }}
+            <el-tag
+              :type="
+                getStatusType(
+                  row.downloadStatus,
+                  row.isPendingDueToLowDiskSpace
+                )
+              "
+            >
+              {{
+                getStatusText(
+                  row.downloadStatus,
+                  row.isPendingDueToLowDiskSpace
+                )
+              }}
             </el-tag>
           </template>
         </el-table-column>
@@ -356,7 +368,10 @@ const openLink = (url: string) => {
   }
 };
 
-const getStatusText = (status: number) => {
+const getStatusText = (status: number, isPendingDueToLowDiskSpace: boolean) => {
+  if (isPendingDueToLowDiskSpace) {
+    return "空间暂存";
+  }
   const statusMap: Record<number, string> = {
     0: "待下载",
     1: "下载中",
@@ -366,7 +381,10 @@ const getStatusText = (status: number) => {
   return statusMap[status] || "未知";
 };
 
-const getStatusType = (status: number) => {
+const getStatusType = (status: number, isPendingDueToLowDiskSpace: boolean) => {
+  if (isPendingDueToLowDiskSpace) {
+    return "warning";
+  }
   const typeMap: Record<number, any> = {
     0: "info",
     1: "primary",

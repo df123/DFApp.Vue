@@ -523,8 +523,15 @@ const loadTableData = async () => {
     tableData.value = result.items;
     pagination.total = result.totalCount;
 
+    // 获取总计
+    const totalAmount = await expenditureApi.getTotalExpenditure({
+      filter: searchForm.filter || undefined,
+      categoryId: searchForm.categoryId,
+      isBelongToSelf: searchForm.isBelongToSelf
+    });
+
     // 计算统计信息
-    calculateStatistics();
+    calculateStatistics(totalAmount);
   } catch (error) {
     console.error("加载支出数据失败:", error);
     ElMessage.error("加载支出数据失败");
@@ -533,13 +540,12 @@ const loadTableData = async () => {
   }
 };
 
-const calculateStatistics = () => {
+const calculateStatistics = (totalAmount: number) => {
   pageTotal.value = tableData.value.reduce(
     (sum, item) => sum + item.expenditure,
     0
   );
-  // 注意：这里只计算了当前页的总和，实际项目中可能需要从API获取总和的准确值
-  total.value = pageTotal.value; // 这里简化处理，实际应该从API获取
+  total.value = totalAmount;
 };
 
 const handleSearch = () => {
@@ -658,8 +664,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
-
 /* 响应式布局 */
 @media (width <= 768px) {
   .expenditure-container {

@@ -105,6 +105,14 @@ class BookkeepingExpenditureApi {
       }
     );
   }
+
+  async getTotalExpenditure(params?: {
+    filter?: string;
+    categoryId?: number;
+    isBelongToSelf?: boolean;
+  }): Promise<number> {
+    return http.get(`${this.baseUrl}/total-expenditure`, { params });
+  }
 }
 
 // 导出单例实例

@@ -190,7 +190,7 @@ import * as echarts from "echarts";
 
 const data = ref<OilCostComparisonDto | null>(null);
 const loading = ref(false);
-const timeRange = ref("30");
+const timeRange = ref("all");
 const customDateRange = ref<[string, string] | null>(null);
 
 const comparisonChartRef = ref<HTMLElement | null>(null);

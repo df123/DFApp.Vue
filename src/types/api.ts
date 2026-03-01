@@ -201,6 +201,8 @@ export interface ElectricVehicleChargingRecordDto {
   vehicle?: ElectricVehicleDto;
   creationTime: string;
   lastModificationTime?: string;
+  currentMileage?: number;
+  mileageDiff?: number;
 }
 
 export interface CreateUpdateElectricVehicleChargingRecordDto {

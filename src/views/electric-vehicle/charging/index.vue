@@ -34,6 +34,11 @@
             }}
           </template>
         </el-table-column>
+        <el-table-column prop="mileageDiff" label="里程差值" width="140">
+          <template #default="{ row }">
+            {{ row.mileageDiff ? row.mileageDiff.toFixed(1) + " km" : "-" }}
+          </template>
+        </el-table-column>
         <el-table-column prop="vehicle.name" label="车辆" min-width="120" />
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
@@ -225,6 +230,22 @@ const loadTableData = async () => {
     });
     tableData.value = result.items;
     pagination.total = result.totalCount;
+
+    tableData.value.sort(
+      (a, b) =>
+        new Date(b.chargingDate).getTime() - new Date(a.chargingDate).getTime()
+    );
+
+    tableData.value.forEach((item, index) => {
+      if (index < tableData.value.length - 1) {
+        const nextItem = tableData.value[index + 1];
+        if (item.currentMileage && nextItem.currentMileage) {
+          item.mileageDiff = item.currentMileage - nextItem.currentMileage;
+        }
+      } else {
+        item.mileageDiff = undefined;
+      }
+    });
   } catch (error) {
     console.error("加载充电数据失败:", error);
     ElMessage.error("加载充电数据失败");
